@@ -1,5 +1,6 @@
 const db = require('../config/db')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const createUser = async (req, res) => {
     const { name, email, password } = req.body;
@@ -15,7 +16,8 @@ const createUser = async (req, res) => {
         await db.execute('insert into users (name, email, password) values (?, ?, ?)',
             [name, email, hashedPassword]
         );
-        res.status(201).send('User Creation Successful!')
+        const [result] = await db.execute('select id from users where email = ?', [email]);
+        res.status(201).send({user_id: user_id, message:"User Created Successfully"})
     }
     catch (err) {
         console.error(err);
@@ -23,9 +25,35 @@ const createUser = async (req, res) => {
     }
 };
 
-// const verifyUser = async (req, res) => {
+const verifyUser = async (req, res) => {
+    const { user_id, password } = req.body;
+    if(!user_id || !password)
+        return res.status(400).send("Enter all details");
 
-// }
+    try {
+        const [result] = await db.execute('select password from users where id = ?', [user_id]);
+        if(result.length === 0)
+            return res.status(404).send("User Not Found!");
+
+        const isPasswordCorrect = await bcrypt.compare(password, user[0].password);
+        if(isPasswordCorrect)
+            return res.status(400).send("Incorrect Password");
+
+        // generate JWT token
+        const payload = {
+            userId: user[0].id,  // You can include any other information here, like user role or email
+            email: user[0].email,
+        };
+        
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });       
+
+        res.status(200).send({ token:token, message:"Logged in Successfully !"})
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Database Error!");
+    }
+}
 
 const readUser = async (req, res) => {
     const { email } = req.params;
@@ -89,4 +117,4 @@ const allUsers = async (req, res) => {
     }
 };
 
-module.exports = { createUser, readUser, updateUser, deleteUser, allUsers };
+module.exports = { createUser, readUser, verifyUser, updateUser, deleteUser, allUsers };
