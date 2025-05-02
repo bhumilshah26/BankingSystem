@@ -3,9 +3,11 @@ import { FaCreditCard, FaHandHoldingUsd, FaChartLine, FaUserCircle, FaBitcoin } 
 import img1 from '../assets/img1.png';
 import img2 from '../assets/img2.png';
 import img3 from '../assets/img3.png';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   const slides = [
     { id: 1, image: img1, title: 'Zero Balance Accounts for Students' },
@@ -63,10 +65,10 @@ const LandingPage = () => {
         </div>
 
         <div className="flex gap-4 ml-5">
-          <button className="px-4 py-2 border border-[#832625] text-[#832625] rounded hover:bg-[#832625] hover:text-[#e5cbcb] transition">
+          <button onClick={() => {navigate('/login')}} className="px-4 py-2 border border-[#832625] text-[#832625] rounded hover:bg-[#832625] hover:text-[#e5cbcb] transition">
             Login
           </button>
-          <button className="px-4 py-2 bg-[#832625] text-[#e5cbcb] rounded hover:bg-[#6b1f1d] transition">
+          <button onClick={() => {navigate('/register')}} className="px-4 py-2 bg-[#832625] text-[#e5cbcb] rounded hover:bg-[#6b1f1d] transition">
             Register
           </button>
         </div>
