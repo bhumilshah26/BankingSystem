@@ -9,7 +9,8 @@ const appendTransfers = async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        const [sender] = await connection.query("select balance from accounts where account_number = ?", [sender_account_number]);
+        const [sender] = await connection.execute("select balance from accounts where account_number = ?", [sender_account_number]);
+        const [receiver] = await connection.execute("select id from accounts where account_number = ?",[receiver_account_number]);
         if(sender.length === 0)
             throw new Error("Sender Not Found");
         

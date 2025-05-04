@@ -15,7 +15,7 @@ const createAccount = async (req, res) => {
 };
 
 const readAccount = async (req, res) => {
-    const { user_id } = req.body;
+    const { user_id } = req.query;
 
     if(!user_id)
         return res.status(400).send('No user logged in!');
@@ -24,11 +24,11 @@ const readAccount = async (req, res) => {
         const [result] = await db.execute('select id, balance from accounts where user_id = ?', [user_id]);
         res.status(200).send(result);
          
-    } catch(err) { console.error( "Error: ", err); res.status(500).send('DataBase Error!'); }
+    } catch(err) { console.error("Error: ", err); res.status(500).send('DataBase Error!'); }
 };
 
 const deleteAccount = async (req, res) => {
-    const { account_id } = req.params;
+    const { account_id } = req.query;
     
     if(!account_id)
         return res.status(404).send('user not given!');
@@ -38,4 +38,15 @@ const deleteAccount = async (req, res) => {
     } catch(err) { console.error("Error: ", err); return res.status(500).send('Database Error!'); }
 };
 
-module.exports = { createAccount, readAccount, deleteAccount };
+const allaccounts = async (req, res) => {
+    const user_id  = req.params.user_id;
+    try {
+        const [accounts] = await db.execute('select account_number from accounts where user_id = ?', [user_id]);
+        console.log(Array.from(accounts));
+        res.status(200).send({accounts:accounts, message:"retrieval sucessful"})
+    } catch (e) {
+        res.send(400).send("database error!");
+    }
+}
+
+module.exports = { createAccount, readAccount, deleteAccount, allaccounts };

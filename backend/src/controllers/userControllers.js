@@ -40,8 +40,11 @@ const verifyUser = async (req, res) => {
             return res.status(404).send("User Not Found!");
 
         const isPasswordCorrect = await bcrypt.compare(password, result[0].password);
+        console.log(isPasswordCorrect);
+        console.log(await bcrypt.hash(password, 10));
+        console.log(result[0].password)
         if(!isPasswordCorrect)
-            return res.status(200).send({message: "Incorrect Password"});
+            return res.status(400).send({message: "Incorrect Password"});
 
         // generate JWT token
         const payload = {
@@ -65,7 +68,7 @@ const readUser = async (req, res) => {
         return res.status(400).send("No email");
 
     try {
-        const [results] = await db.execute('select id from users where email = ?', [email]);
+        const [results] = await db.execute('select user_id from users where email = ?', [email]);
         if(email && results.length > 0) {
             const user_details = {
                 name:results[0].name,
