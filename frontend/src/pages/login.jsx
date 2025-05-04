@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [userid, setUserid] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       const response = await axios.post("http://localhost:5000/users/verify", { userid, password });
-      console.log(response.data.token)
-      localStorage.setItem('token', response.data.token);
-      if(response.status === 200) { /* navigate to dashboard */ }
-    } catch (e) {
-      
-    }
+      if(response.status === 200) { 
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user_id', userid);
+        navigate('/dashboard');
+      }
+    } catch (e) { alert("Incorrect Details entered!!!") }
   }
+  
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="bg-[#832625] w-full py-4 text-white text-center font-bold text-2xl">
@@ -39,7 +42,7 @@ const Login = () => {
         />
 
         <button onClick={handleLogin} className="bg-[#832625] hover:bg-[#6b1f1d] text-white font-bold py-2 px-4 rounded w-full">
-          Sign In
+          Log In
         </button>
 
         <div className="text-sm text-center text-[#832625] mt-4">
