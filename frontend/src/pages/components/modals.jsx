@@ -207,14 +207,13 @@ const Modals = ({ type, onClose }) => {
               <div className="bg-gray-100 p-4 mt-2 rounded font-bold">
                 Your monthly emi is calculated to be ₹{emi.toFixed(2)}.<br/>
                 Your principal amount is ₹{parseFloat(principalLoanAmount).toFixed(2)}.<br/>
-                Your total interest is ₹{parseFloat(total - principalLoanAmount).toFixed(2)}.<br />
+                Your total interest is ₹{parseFloat((total - principalLoanAmount) > 0 ? (total - principalLoanAmount) : 0).toFixed(2)}.<br />
                 Your total amount is ₹{parseFloat(total).toFixed(2)}. <br />
               </div>
               <button onClick={calculateEMI} className="bg-[#832625] text-[#e5cbcb] w-full py-2 rounded">Calculate</button>
             </div>
           </ModalWrapper>
         );
-      
 
     case "Investments":
       const simpleInt = () => {

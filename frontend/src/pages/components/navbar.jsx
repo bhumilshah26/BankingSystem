@@ -14,7 +14,7 @@ const Navbar = () => {
     
   return (
     <div>
-      <nav className="flex justify-between items-center p-6 shadow-md z-10 relative">
+      <nav className="flex justify-between items-center p-4 shadow-md z-10 relative">
         <div className="text-2xl font-bold text-[#832625]">
           BSNB Bhumil Shah National Bank
         </div>
