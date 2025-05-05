@@ -1,42 +1,68 @@
 const db = require('../config/db.js')
+const transporter = require('../config/mailer.js')
 
 const appendTransfers = async (req, res) => {
     // future: the reciver_account_id can be added via its email or phone no (adding beneficiary)
-    const { sender_account_number, receiver_account_number, amount, description } = req.body;
+    const { san, ban, ftamount, ftdesc } = req.body;
 
     const connection = await db.getConnection();
 
     try {
         await connection.beginTransaction();
 
-        const [sender] = await connection.execute("select balance from accounts where account_number = ?", [sender_account_number]);
-        const [receiver] = await connection.execute("select id from accounts where account_number = ?",[receiver_account_number]);
+        const [sender] = await connection.execute("select balance from accounts where account_number = ?", [san]);
+        const [receiver] = await connection.execute("select id from accounts where account_number = ?",[ban]);
         if(sender.length === 0)
             throw new Error("Sender Not Found");
         
+        if(receiver.length === 0)
+            throw new Error("Receiver Not Found");
+
+        const amount = parseFloat(ftamount);
     
-        if(sender[0].amount < amount) 
-            throw new Error("Insufficient Balance");
-        
+        if(sender[0].balance < amount) { return res.status(400).send({message:"Insufficient Balance!"}); }
             
-        await connection.execute("update accounts set balance = balance - ? where account_number = ?", [amount, sender_account_number]);
-        await connection.execute("update accounts set balance = balance + ? where account_number = ?", [amount, receiver_account_number]);
+        await connection.execute("update accounts set balance = balance - ? where account_number = ?", [ftamount, san]);
+        await connection.execute("update accounts set balance = balance + ? where account_number = ?", [ftamount, ban]);
 
         await connection.execute("insert into transfers(sender_account_number, receiver_account_number, amount, description, status) values (?, ?, ?, ?, ?)", 
-            [sender_account_number, receiver_account_number, amount, description, "success"]
+            [san, ban, ftamount, ftdesc, "success"]
         );   
         
         await connection.commit();
+        // const [senderuserdetails] = await db.execute('select name, email from users where user_id = (select user_id from accounts where account_number = ?)', 
+        //     [san]);
+        // const [receiveruserdetails] = await db.execute('select name, email from users where user_id = (select uesr_id from accounts where account_number = ?)',
+        //     [ban]);
+        
+        // const last4sender = san.toString().slice(-4);
+        // const last4reciever = ban.toString().slice(-4);
 
-        res.status(200).send("Transfer Complete !");
+        // const sendermailOptions = {
+        //     from: 'bhumil.shah2608@gmail.com',
+        //     to:senderuserdetails[0].email,
+        //     subject:`Transaction Alert`,
+        //     text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4sender} has been debited for INR ${ftamount} towards Net Banking.\n\nThe balance avaliable in your account is ${parseFloat(senderuserdetails[0].balance - ftamount)}`
+        // };
+        // transporter.sendMail(sendermailOptions, (err, info) => {console.log(err)});
+
+        // const receivermailOptions = {
+        //     from: 'bhumil.shah2608@gmail.com',
+        //     to:receiveruserdetails[0].email,
+        //     subject:`Transaction Alert`,
+        //     text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4reciever} has been credited for INR ${ftamount} towards Net Banking.\n\nThe balance avaliable in your account is ${parseFloat(receiveruserdetails[0].balance + ftamount)}`
+        // };
+        // transporter.sendMail(receivermailOptions, (err, info) => {console.log(err)});
+
+        return res.status(200).send({message: "Transfer Complete !"});
 
     } catch(e) {
         await connection.rollback();
         await connection.execute("insert into transfers(sender_account_number, receiver_account_number, amount, description, status) values (?, ?, ?, ?, ?)", 
-            [sender_account_number, receiver_account_number, amount, description, "fail"]
+            [san, ban, ftamount, ftdesc, "fail"]
         );
 
-        res.status(500).send({error:e, message:"Transfer Incomplete"});
+        return res.status(500).send({error:e.message, message:"Transfer Incomplete"});
 
     } finally {
         connection.release();

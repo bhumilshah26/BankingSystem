@@ -40,9 +40,6 @@ const verifyUser = async (req, res) => {
             return res.status(404).send("User Not Found!");
 
         const isPasswordCorrect = await bcrypt.compare(password, result[0].password);
-        console.log(isPasswordCorrect);
-        console.log(await bcrypt.hash(password, 10));
-        console.log(result[0].password)
         if(!isPasswordCorrect)
             return res.status(400).send({message: "Incorrect Password"});
 

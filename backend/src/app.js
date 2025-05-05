@@ -3,7 +3,6 @@ const cors = require('cors')
 const rateLimit = require('express-rate-limit')
 require('dotenv').config()
 
-
 // Routes
 const userRoutes = require('./routes/userRoutes');
 const accountRoutes = require('./routes/accountRoutes');
