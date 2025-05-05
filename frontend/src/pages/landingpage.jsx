@@ -17,7 +17,9 @@ const LandingPage = () => {
     <div className="min-h-screen flex flex-col">
       {/* Top Navigation */}
       <Navbar/>
-      <Marquee/>
+      {/* <Marquee/> */}
+      <marquee behavior="" className="bg-[#832625] text-white h-10 flex items-center font-semibold">Working hours of Kandivali and Borivali branches have changed from 09:00 A.M. to 04:30 P.M. 
+          Senior Citizen Interest Rates decreased by 0.5%</marquee>
       {/* Carousel Section */}
       <Carousel/>
 

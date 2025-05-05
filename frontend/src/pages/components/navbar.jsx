@@ -1,17 +1,45 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 const Navbar = () => {
-    const features2 = [
-        { title: 'Accounts & Deposits' },
-        { title: 'Cards' },
-        { title: 'Loans' },
-        { title: '%Rates & Offers' },
-        { title: 'Investments & Insurance' },
-    ];
+  const [token, setToken] = useState(null);
+  const features2 = [
+      { title: 'Accounts & Deposits' },
+      { title: 'Cards' },
+      { title: 'Loans' },
+      { title: '%Rates & Offers' },
+      { title: 'Investments & Insurance' },
+  ];
+  const navigate = useNavigate();
+  
+  const showAlert = () => {
+    confirmAlert({
+      title: 'Confirm Action',
+      message: 'Are you sure you want to proceed to logout?',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user_id');
+            navigate('/');
+          }
+        },
+        {
+          label: 'No',
+          onClick: () => {  }
+        }
+      ]
+    });
+  };
+  
+  useEffect(() => {
+    setToken(localStorage.getItem('token'))
+  }, [])
 
-    const navigate = useNavigate();
-    
+
   return (
     <div>
       <nav className="flex justify-between items-center p-4 shadow-md z-10 relative">
@@ -30,14 +58,24 @@ const Navbar = () => {
             </div>
           ))}
         </div>
-        <div className="flex gap-4 ml-5">
-          <button onClick={() => {navigate('/login')}} className="px-4 py-2 border border-[#832625] text-[#832625] rounded hover:bg-[#832625] hover:text-[#e5cbcb] transition">
-            Login
-          </button>
-          <button onClick={() => {navigate('/register')}} className="px-4 py-2 bg-[#832625] text-[#e5cbcb] rounded hover:bg-[#6b1f1d] transition">
-            Register
-          </button>
-        </div>
+        {!token && <div className="flex gap-4 ml-5">
+            <button onClick={() => {navigate('/login')}} className="px-4 py-2 border border-[#832625] text-[#832625] rounded hover:bg-[#832625] hover:text-[#e5cbcb] transition">
+              Login
+            </button>
+            <button onClick={() => {navigate('/register')}} className="px-4 py-2 bg-[#832625] text-[#e5cbcb] rounded hover:bg-[#6b1f1d] transition">
+              Register
+            </button>
+          </div>
+        }
+        {token && <div className="flex gap-4 ml-5">
+            <button onClick={() => {}} className="px-4 py-2 border border-[#832625] text-[#832625] rounded hover:bg-[#832625] hover:text-[#e5cbcb] transition">
+              Profile
+            </button>
+            <button onClick={showAlert} className="px-4 py-2 bg-[#832625] text-[#e5cbcb] rounded hover:bg-[#6b1f1d] transition">
+              Logout
+            </button>
+          </div>
+        }
       </nav>
     </div>
   )
