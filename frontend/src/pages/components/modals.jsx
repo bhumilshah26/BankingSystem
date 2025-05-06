@@ -117,12 +117,12 @@ const Modals = ({ type, onClose }) => {
     case "Bank Statements":
       const handleBankStatements = async () => {
         try {
-          const response = await axios.get("http://localhost/5000/", { baccount });
+          const response = await axios.get(`http://localhost/5000/accounts/accountstatement/${baccount}`);
           if(response.status === 200) {
             setStatements(response.data.statements);
           }
-        } catch (e) { }
-      }
+        } catch (e) { return alert("Unknown Error") }
+      } 
       return (
         <ModalWrapper onClose={onClose}>
           <h2 className="text-xl font-bold mb-4 text-[#832625]">Bank Statements</h2>
