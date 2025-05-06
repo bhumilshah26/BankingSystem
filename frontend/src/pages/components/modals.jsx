@@ -16,26 +16,43 @@ const ModalWrapper = ({ children, onClose }) => (
 );
 
 // this function is being called multiple times do something of this later;
-const getAccountNumbers = async (setAccountNumbers) => {
-  const user_id = localStorage.getItem('user_id');
+const getAccountNumbers = async (user_id, setAccountNumbers) => {
   if(user_id) {
     try {
-          const response = await axios.get(`http://localhost:5000/accounts/allaccounts/${user_id}`);
-          if(response.status === 200) {
-              setAccountNumbers(response.data.accounts);
-          }
+        const response = await axios.get(`http://localhost:5000/accounts/allaccounts/${user_id}`);
+        if(response.status === 200) {
+            setAccountNumbers(response.data.accounts);
+        }
       } catch (e) { console.error("Failed to fetch accounts:", e); }
   }
 };
 
 
 const Modals = ({ type, onClose }) => {
+
+  // create account
+  const user_id = localStorage.getItem('user_id');
+  const [account_number, setAccount_number] = useState(0);
+  const [account_type, setAccount_Type] = useState(0);
+
+  // bank statements
   const [accountNumbers, setAccountNumbers] = useState([]);
-  const [loanType, setLoanType] = useState("");
-  const [isSenior, setIsSenior] = useState(false);
-  const [principalLoanAmount, setPrincipalLoanAmount] = useState(0);
-  const [noofloanmonths, setNoofloanmonths] = useState(0);
-  const [emi, setEmi] = useState(0);
+  const [baccount, setBaccount] = useState(0);
+  const [statements, setStatements] = useState([]);
+
+  // transactions
+  const [taccount, setTaccount] = useState(0);
+  const [tamount, setTamount] = useState(0);
+  const [ttype, setTtype] = useState("deposit");
+  const [tdesc, setTdesc] = useState("");
+  
+  // transfers
+  const [ban, setBan] = useState(0);
+  const [san, setSan] = useState(0);
+  const [ftamount, setFtamount] = useState(0);
+  const [ftdesc, setFtdesc] = useState("");  
+  
+  // investments
   const [roi, setRoi] = useState(0);
   const [simple, setSimple] = useState(true);
   const [nooyears, setNoofyears] = useState(0);
@@ -43,15 +60,15 @@ const Modals = ({ type, onClose }) => {
   const [amount, setAmount] = useState(0);
   const [si, setSi] = useState(0);
   const [ci, setCi] = useState(0);
-  const [ban, setBan] = useState(0);
-  const [san, setSan] = useState(0);
-  const [ftamount, setFtamount] = useState(0);
-  const [ftdesc, setFtdesc] = useState("");
-  const [taccount, setTaccount] = useState(0);
-  const [tamount, setTamount] = useState(0);
-  const [ttype, setTtype] = useState("deposit");
-  const [tdesc, setTdesc] = useState("");
+  
+  // loans
+  const [loanType, setLoanType] = useState("");
+  const [isSenior, setIsSenior] = useState(false);
+  const [principalLoanAmount, setPrincipalLoanAmount] = useState(0);
+  const [noofloanmonths, setNoofloanmonths] = useState(0);
+  const [emi, setEmi] = useState(0);
 
+  // not include some arithematic symbols
   const handleKeyDown = (e) => {
     if (["e", "E", "+", "-"].includes(e.key)) {
      e.preventDefault();
@@ -59,20 +76,38 @@ const Modals = ({ type, onClose }) => {
 
   // this will shoot eveytime modal renders
   useEffect(() => {
-    getAccountNumbers(setAccountNumbers);
+    getAccountNumbers(user_id, setAccountNumbers);
   }, []);
 
   switch (type) {
     case "Create Account":
+      const handleCreateAccount = async () => {
+        if(!(/^15\d{10}$/.test(account_number))) {
+          return alert("Incorrect Input Format");
+        }
+        try {
+          const response = await axios.post("http://localhost:5000/accounts/create", {
+            user_id, account_number, account_type
+          });
+          if(response.status === 201) {
+            alert("Your account was sucessfully created");
+          }
+        } catch (e) { 
+          if(e.response.status === 400) { return alert("Account Number Already Exists"); }
+          
+          return alert("Database Error, Couldn't create account");
+      }
+      };
       return (
         <ModalWrapper onClose={onClose}>
           <h2 className="text-xl font-bold mb-4 text-[#832625]">Create Account</h2>
-          <form className="space-y-4">
-            <input type="text" placeholder="User ID" required className="w-full border rounded p-2" />
-            <input type="number" placeholder="Account Number" required className="w-full border rounded p-2" />
+          <form className="space-y-4" onSubmit={handleCreateAccount}>
+            <input type="text" placeholder="User ID" readOnly value={user_id} className="w-full border rounded p-2 text-gray-700" />
+            <input type="number" placeholder="Account Number" required  onChange={(e)=>{setAccount_number(e.target.value)}}
+            className="w-full border rounded p-2" />
             <div className="flex space-x-4">
-              <label><input type="radio" name="accountType" value="Savings" required /> Savings</label>
-              <label><input type="radio" name="accountType" value="Current" required /> Current</label>
+              <label><input type="radio" name="accountType" value="Savings" required onClick={(e) => {setAccount_Type("savings")}} /> Savings</label>
+              <label><input type="radio" name="accountType" value="Current" required onClick={(e) => {setAccount_Type("current")}}/> Current</label>
             </div>
             <button className="bg-[#832625] text-[#e5cbcb] w-full py-2 rounded">Submit</button>
           </form>
@@ -81,16 +116,23 @@ const Modals = ({ type, onClose }) => {
 
     case "Bank Statements":
       const handleBankStatements = async () => {
-
+        try {
+          const response = await axios.get("http://localhost/5000/", { baccount });
+          if(response.status === 200) {
+            setStatements(response.data.statements);
+          }
+        } catch (e) { }
       }
       return (
         <ModalWrapper onClose={onClose}>
           <h2 className="text-xl font-bold mb-4 text-[#832625]">Bank Statements</h2>
-          <form className="space-y-4">
-            <select required className="w-full border rounded p-2">
-              <option value="">Select Account Number</option>
+          <form className="space-y-4" onSubmit={handleBankStatements}>
+
+            <select required className="w-full border rounded p-2" onChange={(e)=>{setBaccount(parseInt(e.target.value))}}>
+              <option value="" disabled>Select Account Number</option>
               {accountNumbers.map((acc) => <option key={acc.account_number}>{acc.account_number}</option>)}
             </select>
+
             <div className="bg-gray-100 p-4 mt-2 rounded">Results from backend will appear here.</div>
           </form>
         </ModalWrapper>
@@ -98,7 +140,6 @@ const Modals = ({ type, onClose }) => {
 
     case "Deposit/Withdrawal":
       const handleTransactions = async () => {
-          
           if(!(/^15\d{10}$/.test(taccount)))
             alert("Enter Correct Details");
 
@@ -106,9 +147,9 @@ const Modals = ({ type, onClose }) => {
             const response = await axios.post("http://localhost:5000/transactions/add/", {
               taccount, tamount, ttype, tdesc
             });
-            if(response.status === 200) {
-              alert("Transaction Complete");
-            }
+
+            if(response.status === 200) { alert("Transaction Complete"); }
+
           } catch (e) {
               if(e.response.status === 400 && e.response.data.message[0] === 'L') {
                 alert("Insufficient Balance!");
@@ -144,10 +185,9 @@ const Modals = ({ type, onClose }) => {
       const handleFundsTransfer = async () => {
 
         const accregex = /^15\d{10}$/;
-        if(!accregex.test(ban) || !accregex.test(san)) {
-          return alert("Enter Correct details");
+        if(!accregex.test(ban) || !accregex.test(san) || san === ban) {
+          return alert("Enter Correct details")
         }
-
         try {
           const response = await axios.post("http://localhost:5000/transfers/transfer-money", {
             san, ban, ftamount, ftdesc
@@ -157,7 +197,7 @@ const Modals = ({ type, onClose }) => {
           }
 
         } catch (e) { 
-          if(e.response.status === 400 && e.response.data.message[0] == 'I')   
+          if(e.response.status === 400 && e.response.data.message[0] === 'I')   
             alert("Insufficient Balance");
           else { alert("Error kyu aaya?"); }
         }
@@ -170,8 +210,13 @@ const Modals = ({ type, onClose }) => {
             <input type="number" maxLength={12} placeholder="Beneficiary Account Number" required onKeyDown={handleKeyDown}
             className="w-full border rounded p-2" onChange={(e)=>{setBan(parseInt(e.target.value))}}/>
 
-            <input type="number" maxLength={12} placeholder="Your Account Number" required onKeyDown={handleKeyDown}
-            className="w-full border rounded p-2" onChange={(e)=>{setSan(parseInt(e.target.value))}} />
+            <select required className="w-full border rounded p-2" onChange={(e)=>{
+                  setSan(parseInt(e.target.value));
+                }
+              }>
+              <option value="" disabled>Select Your Account Number</option>
+              {accountNumbers.map((acc) => <option key={acc.account_number}>{acc.account_number}</option>)}
+            </select>
 
             <input type="number" step="0.01" placeholder="Amount" required min={1} max={1000000} onKeyDown={handleKeyDown}
             className="w-full border rounded p-2" onChange={(e)=>{setFtamount(parseFloat(e.target.value))}} />
