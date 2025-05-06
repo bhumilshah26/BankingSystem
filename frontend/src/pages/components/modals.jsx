@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'; // optional icon library
 import axios from "axios";
 
-const ModalWrapper = ({ children, onClose }) => (
+const ModalWrapper = ({ children, onClose, type }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+    <div className={`bg-white rounded-lg shadow-lg w-full ${type === 'Bank Statements' ? 'max-w-xl' : 'max-w-md'} p-6 relative`}>
       <button
         className="absolute top-2 right-3 text-gray-500 hover:text-red-600"
         onClick={onClose}
@@ -37,8 +38,28 @@ const Modals = ({ type, onClose }) => {
 
   // bank statements
   const [accountNumbers, setAccountNumbers] = useState([]);
-  const [baccount, setBaccount] = useState(0);
+  const [baccount, setBaccount] = useState(accountNumbers[0]);
   const [statements, setStatements] = useState([]);
+  const getStatusDotColor = (status) => {
+    switch (status) {
+      case "success":
+        return "bg-green-500";
+      case "fail":
+        return "bg-red-500";
+      case "pending":
+        return "bg-gray-500";
+      default:
+        return "bg-gray-300";
+    }
+  };
+  const getArrowIcon = (isIncoming) => {
+    return isIncoming ? (
+      <ArrowDownLeft className="text-green-600 ml-2" />
+    ) : (
+      <ArrowUpRight className="text-red-600 ml-2" />
+    );
+  };
+  
 
   // transactions
   const [taccount, setTaccount] = useState(0);
@@ -115,26 +136,73 @@ const Modals = ({ type, onClose }) => {
       );
 
     case "Bank Statements":
-      const handleBankStatements = async () => {
+      const handleBankStatements = async (e) => {
+        e.preventDefault();
         try {
-          const response = await axios.get(`http://localhost/5000/accounts/accountstatement/${baccount}`);
+          const response = await axios.get(`http://localhost:5000/accounts/accountstatement/${baccount}`);
           if(response.status === 200) {
-            setStatements(response.data.statements);
+            const { transactions, transfers } = response.data;
+            const combined = [
+              ...transactions.map((t) => ({
+                type: "transaction",
+                time: t.transaction_time,
+                status: t.status,
+                amount: t.amount,
+                transaction_type:t.transaction_type,
+                description: t.description,
+                direction: t.transaction_type === "deposit" ? "in" : "out",
+              })),
+              ...transfers.map((t) => ({
+                type: "transfer",
+                time: t.transfer_time,
+                status: t.status,
+                amount: t.amount,
+                transfer_type: baccount === t.sender_account_number ? `Debited to account no. ${t.receiver_account_number}` : `Credited from account no. ${t.sender_account_number}`,
+                description: t.description,
+                direction: baccount === t.receiver_account_number ? "in" : "out",
+              })),
+            ];
+    
+            const sorted = combined.sort((a, b) => new Date(b.time) - new Date(a.time));
+            setStatements(sorted);
           }
         } catch (e) { return alert("Unknown Error") }
       } 
       return (
-        <ModalWrapper onClose={onClose}>
+        <ModalWrapper onClose={onClose} type={type}>
           <h2 className="text-xl font-bold mb-4 text-[#832625]">Bank Statements</h2>
           <form className="space-y-4" onSubmit={handleBankStatements}>
 
-            <select required className="w-full border rounded p-2" onChange={(e)=>{setBaccount(parseInt(e.target.value))}}>
+            <select required className="w-full border rounded p-2" onChange={(e)=>{ setStatements([]); setBaccount(parseInt(e.target.value))}}>
               <option value="" disabled>Select Account Number</option>
               {accountNumbers.map((acc) => <option key={acc.account_number}>{acc.account_number}</option>)}
             </select>
 
-            <div className="bg-gray-100 p-4 mt-2 rounded">Results from backend will appear here.</div>
+            <button type="submit" className="bg-[#832625] text-white px-4 py-2 rounded"> Get Account Statement </button>
           </form>
+          <div className="bg-gray-100 p-4 mt-4 rounded space-y-3 max-h-96 overflow-y-auto">
+            {statements.length === 0 ? (
+              <p className="text-gray-500">No statements available.</p>
+            ) : (
+              statements.map((item, index) => (
+                <div key={index} className="flex items-center justify-between bg-white p-3 rounded shadow-sm">
+                  <div className="flex items-center space-x-3">
+                    <span className={`w-3 h-3 rounded-full ${getStatusDotColor(item.status)}`}></span>
+                    <div>
+                      {item.type === "transfer" && <p>{item.transfer_type}</p> }
+                      {item.type === "transaction" && <p>{item.transaction_type[0].toUpperCase() + item.transaction_type.slice(1)}</p> }
+                      <p className="font-medium">{item.description}</p>
+                      <p className="text-sm text-gray-500">{new Date(item.time).toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="font-semibold">₹{item.amount}</span>
+                    {getArrowIcon(item.direction === "in")}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </ModalWrapper>
       );
 
