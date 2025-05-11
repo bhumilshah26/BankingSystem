@@ -15,11 +15,12 @@ app.use(express.json())
 
 
 // adding a limit to the number of requests per user
+// maybe use a redis store (rate-limit-redis)
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 mins window
     max: 100, // 100 requests per 15 min window
-    message: "Too many requests, wait for some time."
+    message: "Too many requests, wait for some time.",
 });
 
 app.use(limiter);
