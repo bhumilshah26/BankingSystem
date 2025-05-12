@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
@@ -16,10 +16,17 @@ const Login = () => {
       if(response.status === 200) { 
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user_id', userid);
+        localStorage.setItem('name', response.data.user_details.name);
+        localStorage.setItem('email', response.data.user_details.email);
         navigate('/dashboard');
       }
 
     } catch (e) { return alert(e.response.data.message); }
+  };
+
+  const handleKeyDown = (event) => {
+    if(event.key === 'Enter')
+      handleLogin();
   }
   
   return (
@@ -31,14 +38,14 @@ const Login = () => {
       <div className="bg-[#f8f3ed] shadow-md rounded px-8 pt-6 pb-8 my-8 max-w-md w-full">
         <h2 className="text-[#832625] text-xl font-semibold mb-6">Login Using Password</h2>
         
-        <input
+        <input onKeyDown={handleKeyDown}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-4"
           type="text"
           placeholder="User ID"
           onChange={(e) => { setUserid(e.target.value); }}
         />
 
-        <input
+        <input onKeyDown={handleKeyDown}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-6"
           type="password"
           placeholder="Password"

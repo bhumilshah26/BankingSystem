@@ -261,6 +261,7 @@ const Modals = ({ type, onClose }) => {
 
         const accregex = /^15\d{10}$/;
         if(!accregex.test(ban) || !accregex.test(san) || san === ban) {
+          console.log(accregex.test(ban), accregex.test(san), san === ban)
           return alert("Enter Correct details")
         }
         try {

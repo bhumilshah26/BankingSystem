@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import ProfileDropdown from './profiledropdown';
+import { FaBell } from 'react-icons/fa';
 
-const Navbar = () => {
+const Navbar = ({  }) => {
   const [token, setToken] = useState(null);
   const features2 = [
       { title: 'Accounts & Deposits' },
@@ -67,17 +69,19 @@ const Navbar = () => {
             </button>
           </div>
         }
-        {token && <div className="flex gap-4 ml-5">
-            <button onClick={() => {}} className="px-4 py-2 border border-[#832625] text-[#832625] rounded hover:bg-[#832625] hover:text-[#e5cbcb] transition">
-              Profile
-            </button>
-            <button onClick={showAlert} className="px-4 py-2 bg-[#832625] text-[#e5cbcb] rounded hover:bg-[#6b1f1d] transition">
-              Logout
-            </button>
+        {token && <div className="flex items-center space-x-4">
+                {/* Notification Icon */}
+                <FaBell
+                  size={24}
+                  className="text-[#832625] cursor-pointer hover:text-[#6b1f1d] transition"
+                  onClick={() => alert('No new notifications!')}
+                />
+
+                {/* Profile Icon */}
+                <ProfileDropdown />
+                </div>}
+                </nav>
           </div>
-        }
-      </nav>
-    </div>
   )
 }
 

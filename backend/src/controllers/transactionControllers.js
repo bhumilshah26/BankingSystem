@@ -18,8 +18,8 @@ const addtransaction = async (req, res) => {
             return res.status(403).send({message:"Insufficient Balance"});
         
         // accounts are updated automatically using triggers okay?
-        await db.execute('insert into transactions (account_number, amount, transaction_type, description) values (?, ?, ?, ?)',
-            [taccount, tamount, ttype, tdesc]
+        await db.execute('insert into transactions (account_number, amount, transaction_type, description, status) values (?, ?, ?, ?, ?)',
+            [taccount, tamount, ttype, tdesc, "success"]
         );
         const [userdetails] = await db.execute('select name, email from users where user_id = (select user_id from accounts where account_number = ?)', 
             [taccount]);
@@ -38,11 +38,13 @@ const addtransaction = async (req, res) => {
             subject:`Transaction Alert`,
             text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4} has been ${transaction} for INR ${tamount} towards Net Banking.\n\nThe balance avaliable in your account is ${newBalance}`
         };
-        transporter.sendMail(mailOptions, (err, info) => {  console.log("Error: ", err); });
+        transporter.sendMail(mailOptions, (err, info) => { if(err) console.log("Error: ", err); });
 
         return res.status(200).send({message:'Transaction Successful!'});
 
-    } catch(err) { return res.status(500).send({message: 'Database Error!'}); }
+    } catch(err) { 
+        return res.status(500).send({message: 'Database Error!'}); 
+    }
 
 }
 

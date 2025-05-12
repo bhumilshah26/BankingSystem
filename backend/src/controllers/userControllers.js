@@ -35,7 +35,8 @@ const loginUser = async (req, res) => {
         return res.status(400).send({message:"Insufficient Details"});
 
     try {
-        const [result] = await db.execute('select password from users where user_id = ?', [user_id]);
+        const [result] = await db.execute('select name, email, user_id, password from users where user_id = ?', [user_id]);
+
         if(result.length === 0)
             return res.status(404).send({message:"User Not Found!"});
 
@@ -46,7 +47,7 @@ const loginUser = async (req, res) => {
         
         const token = jwt.sign({ user_id:user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });       
 
-        return res.status(200).send({token:token, message:"Login Success!"})
+        return res.status(200).send({user_details: {name:result[0].name, email:result[0].email, userid:result[0].user_id}, token:token, message:"Login Success!"})
 
     } catch (err) { return res.status(500).send({message: "Database Error!"}); }
 }
@@ -115,8 +116,7 @@ const allUsers = async (req, res) => {
         res.status(200).send({ count: users[0].count }); 
     }
     catch(err) {
-        console.error(err);
-        res.status(500).send({message:"Database Error!"});
+       return res.status(500).send({message:"Database Error!"});
     }
 };
 

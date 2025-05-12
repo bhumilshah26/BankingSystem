@@ -1,4 +1,5 @@
 const db = require('../config/db')
+const bcrypt = require('bcrypt')
 
 const createAccount = async (req, res) => {
     const { user_id, account_number, account_type } = req.body;
@@ -33,14 +34,30 @@ const readAccount = async (req, res) => {
 };
 
 const deleteAccount = async (req, res) => {
-    const { account_id } = req.query;
-    
-    if(!account_id)
-        return res.status(404).send('user not given!');
+    const { accountNumber, password, user_id } = req.body;
+        
+    if(!user_id)
+        return res.status(404).send({message:'user not given!'});
 
     try {
-        await db.execute('delete from accounts where id = ?', [account_id]);
-    } catch(err) { return res.status(500).send({message:'Database Error!'}); }
+        const [result1] = await db.execute('select id from accounts where account_number = ?', [accountNumber]);
+
+        if(result1.length === 0)
+            return res.status(404).send({message:"Account doesn't exists!"});
+
+        const [result2] = await db.execute('select password from users where user_id = ?', [user_id]);
+        if(result2.length === 0)
+            return res.status(404).send({message:"User Not Found!"});
+            
+        const isPasswordCorrect = await bcrypt.compare(password, result2[0].password);
+        if(!isPasswordCorrect)
+            return res.status(409).send({message:"Incorrect Password"});
+
+        await db.execute('delete from accounts where account_number = ?', [accountNumber]);
+
+        return res.status(200).send({message: "Account Deletion Successfull"});
+
+    } catch(err) { console.error(err); return res.status(500).send({message:'Database Error!'}); }
 };
 
 const allaccounts = async (req, res) => {

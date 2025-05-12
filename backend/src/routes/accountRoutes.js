@@ -3,7 +3,7 @@ const { createAccount, readAccount, deleteAccount, allaccounts, accountstatement
 
 router.post('/create', createAccount);
 router.get('/read', readAccount);
-router.delete('/delete', deleteAccount);
+router.post('/delete', deleteAccount);
 router.get('/allaccounts/:user_id', allaccounts);
 router.get('/accountstatement/:account_number', accountstatements);
 

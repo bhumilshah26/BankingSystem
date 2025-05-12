@@ -1,7 +1,6 @@
 import { FaCreditCard, FaHandHoldingUsd, FaChartLine, FaUserCircle, FaBitcoin } from 'react-icons/fa';
 import Navbar from './components/navbar';
 import Carousel from './components/carousel';
-import Marquee from './components/marquee';
 
 const LandingPage = () => {
 
@@ -16,12 +15,12 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top Navigation */}
-      <Navbar/>
+      <Navbar />
       {/* <Marquee/> */}
       <marquee behavior="" className="bg-[#832625] text-white h-10 flex items-center font-semibold">Working hours of Kandivali and Borivali branches have changed from 09:00 A.M. to 04:30 P.M. 
           Senior Citizen Interest Rates decreased by 0.5%</marquee>
       {/* Carousel Section */}
-      <Carousel/>
+      <Carousel />
 
       {/* Feature Icons Section */}
       <div className="flex justify-evenly items-center py-10">
