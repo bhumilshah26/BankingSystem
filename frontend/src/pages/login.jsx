@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
 
 const Login = () => {
   const [userid, setUserid] = useState('');
@@ -8,14 +8,18 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    if(userid === '' || password === '')
+        return alert("Enter all the details")
     try {
-      const response = await axios.post("http://localhost:5000/users/verify", { userid, password });
+      const response = await api.post("/users/verify", { userid, password });
+
       if(response.status === 200) { 
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user_id', userid);
         navigate('/dashboard');
       }
-    } catch (e) { alert("Incorrect Details entered!!!") }
+
+    } catch (e) { return alert(e.response.data.message); }
   }
   
   return (

@@ -15,8 +15,9 @@ const addtransaction = async (req, res) => {
             return res.status(404).send({message: "Account Not Found"});
 
         if(ttype === "withdrawal" && account[0].balance < parseFloat(tamount)) 
-            return res.status(400).send({message:"Low Balance"});
+            return res.status(403).send({message:"Insufficient Balance"});
         
+        // accounts are updated automatically using triggers okay?
         await db.execute('insert into transactions (account_number, amount, transaction_type, description) values (?, ?, ?, ?)',
             [taccount, tamount, ttype, tdesc]
         );
@@ -26,21 +27,22 @@ const addtransaction = async (req, res) => {
         const transaction = ttype === 'deposit' ? 'credited' : 'debited'; 
         const last4 = taccount.toString().slice(-4);
         let newBalance = account[0].balance;
+        const amt = parseFloat(tamount);
 
-        if(ttype === 'deposit') { newBalance += tamount; }
-        else { newBalance -= tamount; }
+        if(ttype === 'deposit') { newBalance += amt; }
+        else { newBalance -= amt; }
 
         const mailOptions = {
             from: 'bhumil.shah2608@gmail.com',
             to:userdetails[0].email,
             subject:`Transaction Alert`,
-            text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4} has been ${transaction} for INR ${tamount} towards Net Banking.\n\nThe balance avaliable in your account is ${parseFloat(newBalance)}`
+            text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4} has been ${transaction} for INR ${tamount} towards Net Banking.\n\nThe balance avaliable in your account is ${newBalance}`
         };
-        transporter.sendMail(mailOptions, (err, info) => { if(err) { console.log("Error: ", err); }});
+        transporter.sendMail(mailOptions, (err, info) => {  console.log("Error: ", err); });
 
-        return res.status(200).send('Transaction Successful!');
+        return res.status(200).send({message:'Transaction Successful!'});
 
-    } catch(err) { console.error('Error: ', err); res.status(500).send('Database Error!'); }
+    } catch(err) { return res.status(500).send({message: 'Database Error!'}); }
 
 }
 

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'; // optional icon library
-import axios from "axios";
+import api from '../../api'
 
 const ModalWrapper = ({ children, onClose, type }) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -20,11 +20,11 @@ const ModalWrapper = ({ children, onClose, type }) => (
 const getAccountNumbers = async (user_id, setAccountNumbers) => {
   if(user_id) {
     try {
-        const response = await axios.get(`http://localhost:5000/accounts/allaccounts/${user_id}`);
+        const response = await api.get(`/accounts/allaccounts/${user_id}`);
         if(response.status === 200) {
             setAccountNumbers(response.data.accounts);
         }
-      } catch (e) { console.error("Failed to fetch accounts:", e); }
+      } catch (e) { alert("Error Fetching Accounts! ")}
   }
 };
 
@@ -103,22 +103,29 @@ const Modals = ({ type, onClose }) => {
   switch (type) {
     case "Create Account":
       const handleCreateAccount = async () => {
-        if(!(/^15\d{10}$/.test(account_number))) {
-          return alert("Incorrect Input Format");
+        
+        if(user_id === '' || isNaN(account_number) || account_type === '') {
+          return alert("Insufficient Details");
         }
+
+        if(!(/^15\d{10}$/.test(account_number))) {
+          return alert("Incorrect Account Number Format");
+        }
+
         try {
-          const response = await axios.post("http://localhost:5000/accounts/create", {
+          const response = await api.post("/accounts/create", {
             user_id, account_number, account_type
           });
+
           if(response.status === 201) {
-            alert("Your account was sucessfully created");
+            alert(response.data.message);
           }
+
         } catch (e) { 
-          if(e.response.status === 400) { return alert("Account Number Already Exists"); }
-          
-          return alert("Database Error, Couldn't create account");
-      }
+          return alert(e.response.data.message);
+        }
       };
+
       return (
         <ModalWrapper onClose={onClose}>
           <h2 className="text-xl font-bold mb-4 text-[#832625]">Create Account</h2>
@@ -139,25 +146,27 @@ const Modals = ({ type, onClose }) => {
       const handleBankStatements = async (e) => {
         e.preventDefault();
         try {
-          const response = await axios.get(`http://localhost:5000/accounts/accountstatement/${baccount}`);
+          const response = await api.get(`/accounts/accountstatement/${baccount}`);
           if(response.status === 200) {
+
             const { transactions, transfers } = response.data;
             const combined = [
               ...transactions.map((t) => ({
                 type: "transaction",
-                time: t.transaction_time,
+                time: new Date(t.transaction_time).toLocaleString(),
                 status: t.status,
                 amount: t.amount,
-                transaction_type:t.transaction_type,
+                transaction_type:t.transaction_type[0].toUpperCase() + t.transaction_type.slice(1),
                 description: t.description,
                 direction: t.transaction_type === "deposit" ? "in" : "out",
               })),
               ...transfers.map((t) => ({
                 type: "transfer",
-                time: t.transfer_time,
+                time: new Date(t.transfer_time).toLocaleString(),
                 status: t.status,
                 amount: t.amount,
-                transfer_type: baccount === t.sender_account_number ? `Debited to account no. ${t.receiver_account_number}` : `Credited from account no. ${t.sender_account_number}`,
+                transfer_type: baccount === t.sender_account_number ? `Debited to account no. ${t.receiver_account_number}` 
+                                : `Credited from account no. ${t.sender_account_number}`,
                 description: t.description,
                 direction: baccount === t.receiver_account_number ? "in" : "out",
               })),
@@ -166,7 +175,7 @@ const Modals = ({ type, onClose }) => {
             const sorted = combined.sort((a, b) => new Date(b.time) - new Date(a.time));
             setStatements(sorted);
           }
-        } catch (e) { return alert("Unknown Error") }
+        } catch (e) { return alert(e.response.data.message) }
       } 
       return (
         <ModalWrapper onClose={onClose} type={type}>
@@ -174,7 +183,7 @@ const Modals = ({ type, onClose }) => {
           <form className="space-y-4" onSubmit={handleBankStatements}>
 
             <select required className="w-full border rounded p-2" onChange={(e)=>{ setStatements([]); setBaccount(parseInt(e.target.value))}}>
-              <option value="" disabled>Select Account Number</option>
+              <option value="" defaultValue={statements[0]}>Select Account Number</option>
               {accountNumbers.map((acc) => <option key={acc.account_number}>{acc.account_number}</option>)}
             </select>
 
@@ -190,9 +199,9 @@ const Modals = ({ type, onClose }) => {
                     <span className={`w-3 h-3 rounded-full ${getStatusDotColor(item.status)}`}></span>
                     <div>
                       {item.type === "transfer" && <p>{item.transfer_type}</p> }
-                      {item.type === "transaction" && <p>{item.transaction_type[0].toUpperCase() + item.transaction_type.slice(1)}</p> }
+                      {item.type === "transaction" && <p>{item.transaction_type}</p> }
                       <p className="font-medium">{item.description}</p>
-                      <p className="text-sm text-gray-500">{new Date(item.time).toLocaleString()}</p>
+                      <p className="text-sm text-gray-500">{item.time}</p>
                     </div>
                   </div>
                   <div className="flex items-center">
@@ -212,16 +221,14 @@ const Modals = ({ type, onClose }) => {
             alert("Enter Correct Details");
 
           try {
-            const response = await axios.post("http://localhost:5000/transactions/add/", {
+            const response = await api.post("/transactions/add/", {
               taccount, tamount, ttype, tdesc
             });
 
             if(response.status === 200) { alert("Transaction Complete"); }
 
           } catch (e) {
-              if(e.response.status === 400 && e.response.data.message[0] === 'L') {
-                alert("Insufficient Balance!");
-              }
+              return alert(e.response.data.message);
            }
       };
       return (
@@ -257,7 +264,7 @@ const Modals = ({ type, onClose }) => {
           return alert("Enter Correct details")
         }
         try {
-          const response = await axios.post("http://localhost:5000/transfers/transfer-money", {
+          const response = await api.post("/transfers/transfer-money", {
             san, ban, ftamount, ftdesc
           });
           if(response.status === 200) { 
@@ -265,9 +272,7 @@ const Modals = ({ type, onClose }) => {
           }
 
         } catch (e) { 
-          if(e.response.status === 400 && e.response.data.message[0] === 'I')   
-            alert("Insufficient Balance");
-          else { alert("Error kyu aaya?"); }
+          alert(e.response.data.message); 
         }
       };
       return (

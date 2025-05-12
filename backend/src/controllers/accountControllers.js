@@ -9,13 +9,13 @@ const createAccount = async (req, res) => {
         await db.execute('insert into accounts(user_id, account_number, account_type) values (?, ?, ?)',
             [user_id, account_number, account_type]
         );
-        return res.status(201).send('Account Creation Successful!');
+        return res.status(201).send({message:'Account Creation Successful!'});
 
     } catch(err) {
-        if(err.sqlMessage[0] == 'D')
-            return res.status(400).send({message:"Unsuccessful Account Creation"}); 
+        if(err.code === 'ER_DUP_ENTRY')
+            return res.status(409).send({message:"Account Already Exists!"}); 
         
-        return res.status(500).send({message:"Database error"})
+        return res.status(500).send({message:"Database Error!"})
     }
 };
 
@@ -23,13 +23,13 @@ const readAccount = async (req, res) => {
     const { user_id } = req.query;
 
     if(!user_id)
-        return res.status(400).send('No user logged in!');
+        return res.status(400).send({message: 'No user found!'});
 
     try {
         const [result] = await db.execute('select id, balance from accounts where user_id = ?', [user_id]);
         return res.status(200).send(result);
          
-    } catch(err) { console.error("Error: ", err); return res.status(500).send('DataBase Error!'); }
+    } catch(err) { return res.status(500).send({message: 'DataBase Error!'}); }
 };
 
 const deleteAccount = async (req, res) => {
@@ -40,16 +40,16 @@ const deleteAccount = async (req, res) => {
 
     try {
         await db.execute('delete from accounts where id = ?', [account_id]);
-    } catch(err) { console.error("Error: ", err); return res.status(500).send('Database Error!'); }
+    } catch(err) { return res.status(500).send({message:'Database Error!'}); }
 };
 
 const allaccounts = async (req, res) => {
     const user_id  = req.params.user_id;
     try {
         const [accounts] = await db.execute('select account_number from accounts where user_id = ?', [user_id]);
-        return res.status(200).send({accounts:accounts, message:"retrieval sucessful"})
+        return res.status(200).send({accounts:accounts, message:"Retrieval Success"})
     } catch (e) {
-        return res.status(400).send({message: "database Error!"});
+        return res.status(500).send({message: "Database Error!"});
     }
 }
 

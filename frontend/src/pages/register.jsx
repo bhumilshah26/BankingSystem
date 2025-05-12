@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from "axios";
+import api from '../api'
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -10,15 +10,23 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleRegister = async () => {
+    if(name === '' || userid === '' || email === '' || password === '') {
+      return alert("Insufficient Details");
+    }
+
+    if(!(/^[a-z0-9._%+-]+@gmail\.com$/.test(email.toLowerCase()))) {
+      return alert("Incorrect Email Format");
+    }
+
     try {
-      const response = await axios.post('http://localhost:5000/users/create', {
-        name, userid, email, password
-      });
-      if(response.status === 201) {
-        navigate("/login");
-      }
-    } catch (e) {
+      const response = await api.post('/users/create', { name, userid, email, password });
       
+      if(response.status === 201) { 
+        navigate("/login"); 
+      }
+
+    } catch (e) { 
+      return alert(e.response.data.message);
     }
   };
   return (

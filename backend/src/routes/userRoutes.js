@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const { createUser, readUser, updateUser, deleteUser, allUsers, verifyUser } = require('../controllers/userControllers')
+const { registerUser, readUser, updateUser, deleteUser, allUsers, loginUser } = require('../controllers/userControllers');
+const authMiddleware = require('../middleware/authMiddleware');
 
 
 // testing ratelimiter route
@@ -7,11 +8,11 @@ router.get('/', (req, res) => {
     res.status(200).send({message:"Received Request"});
 });
 
-router.post('/create', createUser);
-router.post('/verify', verifyUser)
-router.get('/read/:email', readUser);
-router.put('/update', updateUser);
-router.delete('/delete/:user_id', deleteUser);
-router.get('/count', allUsers);
+router.post('/create', registerUser);
+router.post('/verify', loginUser)
+router.get('/read/:email', authMiddleware, readUser);
+router.put('/update', authMiddleware, updateUser);
+router.delete('/delete/:user_id', authMiddleware, deleteUser);
+router.get('/count', authMiddleware, allUsers);
 
 module.exports = router;
