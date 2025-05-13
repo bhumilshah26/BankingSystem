@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowDownLeft, ArrowUpRight } from 'lucide-react'; // optional icon library
+import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import api from '../../api'
 
 const ModalWrapper = ({ children, onClose, type }) => (
@@ -16,8 +16,8 @@ const ModalWrapper = ({ children, onClose, type }) => (
   </div>
 );
 
-// this function is being called multiple times do something of this later;
-const getAccountNumbers = async (user_id, setAccountNumbers) => {
+const getAccountNumbers = async (setAccountNumbers) => {
+  const user_id = localStorage.getItem('user_id')
   if(user_id) {
     try {
         const response = await api.get(`/accounts/allaccounts/${user_id}`);
@@ -60,7 +60,6 @@ const Modals = ({ type, onClose }) => {
     );
   };
   
-
   // transactions
   const [taccount, setTaccount] = useState(0);
   const [tamount, setTamount] = useState(0);
@@ -97,8 +96,8 @@ const Modals = ({ type, onClose }) => {
 
   // this will shoot eveytime modal renders
   useEffect(() => {
-    getAccountNumbers(user_id, setAccountNumbers);
-  }, []);
+    getAccountNumbers(setAccountNumbers);
+  }, []); 
 
   switch (type) {
     case "Create Account":
@@ -184,7 +183,14 @@ const Modals = ({ type, onClose }) => {
 
             <select required className="w-full border rounded p-2" onChange={(e)=>{ setStatements([]); setBaccount(parseInt(e.target.value))}}>
               <option value="" defaultValue={statements[0]}>Select Account Number</option>
-              {accountNumbers.map((acc) => <option key={acc.account_number}>{acc.account_number}</option>)}
+              {accountNumbers.map((acc) => {
+
+              return (
+                <option key={acc.account_number}>
+                  {`${acc.account_number} Balance: ₹${acc.balance}`}
+                </option>
+                );
+              })}
             </select>
 
             <button type="submit" className="bg-[#832625] text-white px-4 py-2 rounded"> Get Account Statement </button>

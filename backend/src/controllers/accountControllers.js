@@ -63,7 +63,7 @@ const deleteAccount = async (req, res) => {
 const allaccounts = async (req, res) => {
     const user_id  = req.params.user_id;
     try {
-        const [accounts] = await db.execute('select account_number from accounts where user_id = ?', [user_id]);
+        const [accounts] = await db.execute('select account_number, balance from accounts where user_id = ?', [user_id]);
         return res.status(200).send({accounts:accounts, message:"Retrieval Success"})
     } catch (e) {
         return res.status(500).send({message: "Database Error!"});
