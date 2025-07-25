@@ -16,7 +16,7 @@ const createAccount = async (req, res) => {
         if(err.code === 'ER_DUP_ENTRY')
             return res.status(409).send({message:"Account Already Exists!"}); 
         
-        return res.status(500).send({message:"Database Error!"})
+        return res.status(500).send({ message:"Database Error!" })
     }
 };
 

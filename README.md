@@ -123,3 +123,16 @@ Rollback occurs on any failure.
 • [GitHub](https://github.com/bhumilshah26) • [LinkedIn](https://linkedin.com/in/bhumilshah26)
 
 ---
+
+Banking System 
+
+https://chatgpt.com/s/dr_680cba826ffc8191b3c43b076105b504
+
+3 admins to this database
+
+1) responsiveness
+
+future:
+0) add role-based access 
+1) registering using twilio and otp-generator
+2) refresh token? session token? know the difference
