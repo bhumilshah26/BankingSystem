@@ -3,10 +3,10 @@ import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import api from '../../api'
 
 const ModalWrapper = ({ children, onClose, type }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className={`bg-white rounded-lg shadow-lg w-full ${type === 'Bank Statements' ? 'max-w-xl' : 'max-w-md'} p-6 relative`}>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-2 sm:px-0">
+    <div className={`bg-white rounded-lg shadow-lg w-full ${type === 'Bank Statements' ? 'max-w-xl' : 'max-w-md'} sm:max-w-xs md:max-w-md xl:max-w-xl p-3 sm:p-6 relative`}>
       <button
-        className="absolute top-2 right-3 text-gray-500 hover:text-red-600"
+        className="absolute top-2 right-3 text-gray-500 hover:text-red-600 text-lg sm:text-xl"
         onClick={onClose}
       >
         ✖

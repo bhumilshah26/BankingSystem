@@ -27,7 +27,7 @@ const Carousel = () => {
 
   return (
     <div className="w-full">
-      <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden bg-[#e5cbcb]">
+      <div className="relative w-full h-[180px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden bg-[#e5cbcb] rounded-md sm:rounded-2xl">
         <div
           className="flex h-full transition-transform duration-700 ease-in-out"
           style={{
@@ -36,24 +36,24 @@ const Carousel = () => {
           }}
         >
           {slides.map((slide) => (
-            <div key={slide.id} className="w-full h-full"> 
+            <div key={slide.id} className="w-full h-full flex items-center justify-center bg-[#e5cbcb]"> 
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="w-full h-full"
+                className="w-full h-full object-contain"
               />
             </div>
           ))}
         </div>
 
-        <div className="absolute bottom-3 left-3 md:bottom-5 md:left-5 bg-[#832625] bg-opacity-80 text-[#e5cbcb] px-2 md:px-3 py-1 md:py-2 rounded-md text-sm md:text-base font-semibold shadow-md max-w-[90%]">
+        <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 md:bottom-5 md:left-5 bg-[#832625] bg-opacity-80 text-[#e5cbcb] px-2 md:px-3 py-1 md:py-2 rounded-md text-xs sm:text-sm md:text-base font-semibold shadow-md max-w-[90%]">
           {slides[currentSlide].title}
         </div>
 
         {/* Left Arrow */}
         <button
           onClick={prevSlide}
-          className="absolute left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-[#e5cbcb] text-[#832625] p-1 md:p-2 rounded-full shadow hover:bg-opacity-75 transition"
+          className="absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-[#e5cbcb] text-[#832625] p-1 sm:p-2 md:p-3 rounded-full shadow hover:bg-opacity-75 transition text-lg sm:text-xl md:text-2xl"
         >
           ‹
         </button>
@@ -61,7 +61,7 @@ const Carousel = () => {
         {/* Right Arrow */}
         <button
           onClick={nextSlide}
-          className="absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-[#e5cbcb] text-[#832625] p-1 md:p-2 rounded-full shadow hover:bg-opacity-75 transition"
+          className="absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-[#e5cbcb] text-[#832625] p-1 sm:p-2 md:p-3 rounded-full shadow hover:bg-opacity-75 transition text-lg sm:text-xl md:text-2xl"
         >
           ›
         </button>
