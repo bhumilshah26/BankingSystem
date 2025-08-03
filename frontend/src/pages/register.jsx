@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import api from '../api'
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -9,6 +10,7 @@ const Register = () => {
   const [userid, setUserid] = useState(''); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -63,12 +65,25 @@ const Register = () => {
           onChange={(e) => { setUserid(e.target.value); }}
 
         />
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-6 text-sm sm:text-base"
-          type="password"
-          placeholder="Password"
-          onChange={(e) => { setPassword(e.target.value); }}
-        />
+        <div className="relative mb-6">
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 pr-10 text-gray-700 text-sm sm:text-base"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            onChange={(e) => { setPassword(e.target.value); }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          >
+            {showPassword ? (
+              <FaEyeSlash className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            ) : (
+              <FaEye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            )}
+          </button>
+        </div>
 
         <button 
           disabled={!name || !userid || !email || !password || isLoading}

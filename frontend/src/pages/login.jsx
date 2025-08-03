@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import api from '../api';
 import LoadingSpinner from './components/LoadingSpinner';
 import InlineLoading from './components/InlineLoading';
@@ -7,6 +8,7 @@ import InlineLoading from './components/InlineLoading';
 const Login = () => {
   const [userid, setUserid] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -54,12 +56,25 @@ const Login = () => {
           onChange={(e) => { setUserid(e.target.value); }}
         />
 
-        <input onKeyDown={handleKeyDown}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-6 text-sm sm:text-base"
-          type="password"
-          placeholder="Password"
-          onChange={(e) => { setPassword(e.target.value); }}
-        />
+        <div className="relative mb-6">
+          <input onKeyDown={handleKeyDown}
+            className="shadow appearance-none border rounded w-full py-2 px-3 pr-10 text-gray-700 text-sm sm:text-base"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            onChange={(e) => { setPassword(e.target.value); }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          >
+            {showPassword ? (
+              <FaEyeSlash className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            ) : (
+              <FaEye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            )}
+          </button>
+        </div>
 
         <button 
           onClick={handleLogin} 
@@ -76,8 +91,13 @@ const Login = () => {
           )}
         </button>
 
-        <div className="text-xs sm:text-sm text-center text-[#832625] mt-4">
-          <a href="/register" className="hover:underline">New User? Register here</a>
+        <div className="text-xs sm:text-sm text-center text-[#832625] mt-4 space-y-2">
+          <div>
+            <a href="/register" className="hover:underline">New User? Register here</a>
+          </div>
+          <div>
+            <a href="/forgot-password" className="hover:underline">Forgot Password?</a>
+          </div>
         </div>
       </div>
       <LoadingSpinner isLoading={isLoading} />

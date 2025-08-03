@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { FaUserCircle } from 'react-icons/fa';
+import { FaUserCircle, FaKey } from 'react-icons/fa';
 import api from '../../api'
+import ChangePasswordModal from './ChangePasswordModal';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const [userDetails, setUserDetails] = useState({});
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -131,6 +133,13 @@ const ProfileDropdown = () => {
           <p><strong className='text-base'>ID:</strong> {userDetails.user_id}</p>
           <div className="mt-4 flex flex-col gap-2">
             <button 
+              onClick={() => setShowChangePassword(true)}
+              className="px-3 py-1 bg-[#832625] text-white rounded hover:bg-[#6b1f1d] transition flex items-center justify-center"
+            >
+              <FaKey className="mr-2" />
+              Change Password
+            </button>
+            <button 
               onClick={handleDeleteAccount} 
               className="px-3 py-1 bg-[#832625] text-white rounded hover:bg-red-700 transition"
             >
@@ -145,6 +154,15 @@ const ProfileDropdown = () => {
           </div>
         </div>
       )}
+      
+      <ChangePasswordModal 
+        isOpen={showChangePassword}
+        onClose={() => setShowChangePassword(false)}
+        onSuccess={() => {
+          setShowChangePassword(false);
+          setIsOpen(false);
+        }}
+      />
     </div>
   );
 };
