@@ -26,7 +26,7 @@ const addtransaction = async (req, res) => {
 
         const transaction = ttype === 'deposit' ? 'credited' : 'debited'; 
         const last4 = taccount.toString().slice(-4);
-        let newBalance = account[0].balance;
+        let newBalance = parseFloat(account[0].balance);
         const amt = parseFloat(tamount);
 
         if(ttype === 'deposit') { newBalance += amt; }
@@ -36,9 +36,9 @@ const addtransaction = async (req, res) => {
             from: 'bhumil.shah2608@gmail.com',
             to:userdetails[0].email,
             subject:`Transaction Alert`,
-            text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4} has been ${transaction} for INR ${tamount} towards Net Banking.\n\nThe balance avaliable in your account is ${newBalance}`
+            text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4} has been ${transaction} for INR ${tamount} towards Net Banking.\n\nThe balance avaliable in your account is ${newBalance.toFixed(2)}`
         };
-        transporter.sendMail(mailOptions, (err, info) => { if(err) console.log("Error: ", err); });
+        transporter.sendMail(mailOptions, (err, info) => { if(err) alert("Error: ", err); });
 
         return res.status(200).send({message:'Transaction Successful!'});
 

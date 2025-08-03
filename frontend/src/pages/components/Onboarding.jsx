@@ -175,11 +175,9 @@ const Onboarding = ({ isOpen, onClose, onComplete }) => {
   ];
 
   const handleNext = () => {
-    console.log('handleNext called, currentStep:', currentStep, 'steps.length:', steps.length);
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      console.log('Calling handleComplete from handleNext');
       handleComplete();
     }
   };
@@ -190,11 +188,9 @@ const Onboarding = ({ isOpen, onClose, onComplete }) => {
     }
   };
 
-  const handleComplete = () => {
-    console.log('handleComplete called');
+    const handleComplete = () => {
     localStorage.setItem('hasSeenOnboarding', 'true');
     setIsFirstTime(false);
-    console.log('Calling onComplete');
     onComplete();
   };
 

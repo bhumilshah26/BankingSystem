@@ -299,25 +299,28 @@ const Modals = ({ type, onClose }) => {
         </>
       );
 
-    case "Deposit/Withdrawal":
-      const handleTransactions = async () => {
-          if(!(/^15\d{10}$/.test(taccount)))
+      case "Deposit/Withdrawal":
+        const handleTransactions = async () => {
+          // Validation - return early if invalid
+          if (!(/^15\d{10}$/.test(taccount))) {
             alert("Enter Correct Details");
-
+            return; // Stop execution here
+          }
+      
           setIsLoadingTransaction(true);
           try {
             const response = await api.post("/transactions/add/", {
               taccount, tamount, ttype, tdesc
             });
-
-            if(response.status === 200) { alert("Transaction Complete"); }
-
+            if (response.status === 200) {
+              return alert("Transaction Complete");
+            }
           } catch (e) {
-              return alert(e.response.data.message);
-           } finally {
+            return alert(e.response.data.message);
+          } finally {
             setIsLoadingTransaction(false);
-           }
-      };
+          }
+        };
       return (
         <>
           <ModalWrapper onClose={onClose}>
@@ -363,7 +366,6 @@ const Modals = ({ type, onClose }) => {
 
         const accregex = /^15\d{10}$/;
         if(!accregex.test(ban) || !accregex.test(san) || san === ban) {
-          console.log(accregex.test(ban), accregex.test(san), san === ban)
           return alert("Enter Correct details")
         }
         setIsLoadingTransfer(true);

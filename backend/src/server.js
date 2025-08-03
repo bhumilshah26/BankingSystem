@@ -5,11 +5,9 @@ const PORT = process.env.PORT;
 
 pool.getConnection((err, connection) => {
     if(err) {
-        console.error("Database Connection Failed: ", err);
         process.exit(1);
     }
-    console.log("Database Connected Successfully!");
     connection.release();
 });
 
-app.listen(PORT, () => { console.log(`Server running: http://localhost:${PORT}`); });
+app.listen(PORT, () => {  });

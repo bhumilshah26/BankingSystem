@@ -47,7 +47,7 @@ const appendTransfers = async (req, res) => {
             subject:`Transaction Alert`,
             text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4sender} has been debited for INR ${ftamount} towards Net Banking.\n\nThe balance avaliable in your account is ${parseFloat(sender[0].balance - ftamount)}`
         };
-        transporter.sendMail(sendermailOptions, (err, info) => { if(err) console.log(err); });
+        transporter.sendMail(sendermailOptions, (err, info) => { if(err) alert(`Error: ${e}`); });
 
         const receivermailOptions = {
             from: 'bhumil.shah2608@gmail.com',
@@ -55,7 +55,7 @@ const appendTransfers = async (req, res) => {
             subject:`Transaction Alert`,
             text:`Dear Customer\n\nThank you for banking with us.\n\nYour BSNB Bank Account No. 15XXXXXX${last4reciever} has been credited for INR ${ftamount} towards Net Banking.\n\nThe balance avaliable in your account is ${parseFloat(receiver[0].balance + ftamount)}`
         };
-        transporter.sendMail(receivermailOptions, (err, info) => { if(err) console.log(err); });
+        transporter.sendMail(receivermailOptions, (err, info) => { if(err) alert(`Error: ${e}`); });
 
         return res.status(200).send({message: "Transfer Complete!"});
 
