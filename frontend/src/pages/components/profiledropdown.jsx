@@ -28,6 +28,10 @@ const ProfileDropdown = () => {
           onClick: async () => {
             localStorage.clear();
             navigate('/');
+            // Add automatic refresh to home page after logout
+            setTimeout(() => {
+              window.location.reload();
+            }, 100);
           }
         },
         {
