@@ -26,7 +26,7 @@ const Carousel = () => {
   }, [nextSlide]);
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-full">
       <div className="relative w-full h-[180px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden bg-[#e5cbcb] rounded-md sm:rounded-2xl">
         <div
           className="flex h-full transition-transform duration-700 ease-in-out"

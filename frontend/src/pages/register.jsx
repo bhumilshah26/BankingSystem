@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import api from '../api'
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from './components/LoadingSpinner';
+import InlineLoading from './components/InlineLoading';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [userid, setUserid] = useState(''); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async () => {
@@ -18,6 +21,7 @@ const Register = () => {
       return alert("Incorrect Email Format");
     }
 
+    setIsLoading(true);
     try {
       const response = await api.post('/users/create', { name, userid, email, password });
       
@@ -27,6 +31,8 @@ const Register = () => {
 
     } catch (e) { 
       return alert(e.response.data.message);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -64,15 +70,26 @@ const Register = () => {
           onChange={(e) => { setPassword(e.target.value); }}
         />
 
-        <button disabled={!name || !userid || !email || !password}
-        onClick={handleRegister} className="bg-[#832625] hover:bg-[#6b1f1d] text-white font-bold py-2 px-4 rounded w-full text-sm sm:text-base">
-          Register
+        <button 
+          disabled={!name || !userid || !email || !password || isLoading}
+          onClick={handleRegister} 
+          className="bg-[#832625] hover:bg-[#6b1f1d] text-white font-bold py-2 px-4 rounded w-full text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          {isLoading ? (
+            <>
+              <InlineLoading size="small" />
+              <span className="ml-2">Registering...</span>
+            </>
+          ) : (
+            "Register"
+          )}
         </button>
 
         <div className="text-xs sm:text-sm text-center text-[#832625] mt-4">
           <a href="/login" className="hover:underline">Already have an account? Login</a>
         </div>
       </div>
+      <LoadingSpinner isLoading={isLoading} />
     </div>
   );
 };

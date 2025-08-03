@@ -121,7 +121,7 @@ const ProfileDropdown = () => {
       />
       {isOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white border border-[#832625] rounded shadow-lg z-50 p-4 text-sm">
-          <h3 className="text-[#832625] font-bold mb-2 text-lg">User Details</h3>
+          <h3 className="text-[#832625] font-bold mb-2 text-lg">Details</h3>
           <p><strong className='text-base'>Name:</strong> {userDetails.name}</p>
           <p><strong className='text-base'>Email:</strong> {userDetails.email}</p>
           <p><strong className='text-base'>ID:</strong> {userDetails.user_id}</p>

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/navbar";
 import Modals from "./components/modals";
 import Carousel from "./components/carousel"
+import Onboarding from "./components/Onboarding";
 // import Marquee from "./components/marquee";
 
 const optionsLevel1 = [
@@ -30,15 +31,30 @@ const OptionCard = ({ title, icon, onClick }) => (
 
 const Dashboard = () => {
   const [activeModal, setActiveModal] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+  };
+
+  const handleShowHelp = () => {
+    setShowOnboarding(true);
+  };
 
   return (
     <div className="bg-white min-h-screen">
-      <Navbar />
+      <Navbar onShowHelp={handleShowHelp} />
       <marquee behavior="" className="bg-[#832625] text-white h-10 flex items-center font-semibold text-xs sm:text-base">Working hours of Kandivali and Borivali branches have changed from 09:00 A.M. to 04:30 P.M. 
           Senior Citizen Interest Rates decreased by 0.5%</marquee>
 
-      <div className="px-2 sm:px-6 py-4 sm:py-6 max-w-7xl mx-auto">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#832625] mb-4 sm:mb-6">Quick Access</h2>
+      <div className="px-2 sm:px-6 py-4 sm:py-6 max-w-7xl mx-auto w-full">
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8">
           {optionsLevel1.map((opt) => (
@@ -67,6 +83,11 @@ const Dashboard = () => {
       {activeModal && (
         <Modals type={activeModal} onClose={() => setActiveModal(null)} />
       )}
+
+      <Onboarding 
+        isOpen={showOnboarding} 
+        onComplete={handleOnboardingComplete}
+      />
 
     </div>
   );

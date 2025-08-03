@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { confirmAlert } from 'react-confirm-alert';
-import 'react-confirm-alert/src/react-confirm-alert.css';
 import ProfileDropdown from './profiledropdown';
 import { FaBell } from 'react-icons/fa';
 import { FaBars } from 'react-icons/fa';
+import { FaQuestionCircle } from 'react-icons/fa';
 
-const Navbar = ({  }) => {
+const Navbar = ({ onShowHelp }) => {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const features2 = [
@@ -18,27 +17,6 @@ const Navbar = ({  }) => {
   ];
   const navigate = useNavigate();
   
-  const showAlert = () => {
-    confirmAlert({
-      title: 'Confirm Action',
-      message: 'Are you sure you want to proceed to logout?',
-      buttons: [
-        {
-          label: 'Yes',
-          onClick: () => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user_id');
-            navigate('/');
-          }
-        },
-        {
-          label: 'No',
-          onClick: () => {  }
-        }
-      ]
-    });
-  };
-  
   useEffect(() => {
     setToken(localStorage.getItem('token'))
   }, [])
@@ -46,8 +24,8 @@ const Navbar = ({  }) => {
 
   return (
     <div>
-      <nav className="flex justify-between items-center p-3 sm:p-4 shadow-md z-10 relative bg-white">
-        <div className="text-lg sm:text-2xl font-bold text-[#832625]">
+      <nav className="flex justify-between items-center p-3 sm:p-4 shadow-md z-10 relative bg-white w-full">
+        <div className="text-lg sm:text-2xl font-bold text-[#832625] text-responsive">
           BSNB Bhumil Shah National Bank
         </div>
 
@@ -80,14 +58,20 @@ const Navbar = ({  }) => {
             </button>
           </div>
         }
-        {token && <div className="hidden sm:flex items-center space-x-4">
-                <FaBell
-                  size={22}
-                  className="text-[#832625] cursor-pointer hover:text-[#6b1f1d] transition"
-                  onClick={() => alert('No new notifications!')}
-                />
-                <ProfileDropdown />
-                </div>}
+                 {token && <div className="hidden sm:flex items-center space-x-4">
+                 <FaBell
+                   size={22}
+                   className="text-[#832625] cursor-pointer hover:text-[#6b1f1d] transition"
+                   onClick={() => alert('No new notifications!')}
+                 />
+                 <FaQuestionCircle
+                   size={22}
+                   className="text-[#832625] cursor-pointer hover:text-[#6b1f1d] transition"
+                   onClick={onShowHelp}
+                   title="Help & Tutorial"
+                 />
+                 <ProfileDropdown />
+                 </div>}
         {/* Mobile menu */}
         {menuOpen && (
           <div className="absolute top-full left-0 w-full bg-white shadow-md flex flex-col items-start p-4 gap-3 sm:hidden z-20 animate-fade-in">
@@ -107,14 +91,20 @@ const Navbar = ({  }) => {
                 Register
               </button>
             </div>}
-            {token && <div className="flex items-center space-x-4 mt-2">
-                <FaBell
-                  size={22}
-                  className="text-[#832625] cursor-pointer hover:text-[#6b1f1d] transition"
-                  onClick={() => alert('No new notifications!')}
-                />
-                <ProfileDropdown />
-              </div>}
+                         {token && <div className="flex items-center space-x-4 mt-2">
+                 <FaBell
+                   size={22}
+                   className="text-[#832625] cursor-pointer hover:text-[#6b1f1d] transition"
+                   onClick={() => alert('No new notifications!')}
+                 />
+                 <FaQuestionCircle
+                   size={22}
+                   className="text-[#832625] cursor-pointer hover:text-[#6b1f1d] transition"
+                   onClick={onShowHelp}
+                   title="Help & Tutorial"
+                 />
+                 <ProfileDropdown />
+               </div>}
           </div>
         )}
       </nav>

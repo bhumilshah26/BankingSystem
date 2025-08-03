@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import LoadingSpinner from './components/LoadingSpinner';
+import InlineLoading from './components/InlineLoading';
 
 const Login = () => {
   const [userid, setUserid] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     if(userid === '' || password === '')
         return alert("Enter all the details")
+    
+    setIsLoading(true);
     try {
       const response = await api.post("/users/verify", { userid, password });
 
@@ -21,7 +26,11 @@ const Login = () => {
         navigate('/dashboard');
       }
 
-    } catch (e) { return alert(e.response.data.message); }
+    } catch (e) { 
+      return alert(e.response.data.message); 
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (event) => {
@@ -52,14 +61,26 @@ const Login = () => {
           onChange={(e) => { setPassword(e.target.value); }}
         />
 
-        <button onClick={handleLogin} className="bg-[#832625] hover:bg-[#6b1f1d] text-white font-bold py-2 px-4 rounded w-full text-sm sm:text-base">
-          Log In
+        <button 
+          onClick={handleLogin} 
+          disabled={isLoading}
+          className="bg-[#832625] hover:bg-[#6b1f1d] text-white font-bold py-2 px-4 rounded w-full text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          {isLoading ? (
+            <>
+              <InlineLoading size="small" />
+              <span className="ml-2">Logging in...</span>
+            </>
+          ) : (
+            "Log In"
+          )}
         </button>
 
         <div className="text-xs sm:text-sm text-center text-[#832625] mt-4">
           <a href="/register" className="hover:underline">New User? Register here</a>
         </div>
       </div>
+      <LoadingSpinner isLoading={isLoading} />
     </div>
   );
 };
