@@ -126,13 +126,6 @@ Rollback occurs on any failure.
 
 Banking System 
 
-https://chatgpt.com/s/dr_680cba826ffc8191b3c43b076105b504
-
-3 admins to this database
-
-1) responsiveness
-
 future:
 0) add role-based access 
 1) registering using twilio and otp-generator
-2) refresh token? session token? know the difference
