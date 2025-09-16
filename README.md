@@ -125,7 +125,3 @@ Rollback occurs on any failure.
 ---
 
 Banking System 
-
-future:
-0) add role-based access 
-1) registering using twilio and otp-generator
