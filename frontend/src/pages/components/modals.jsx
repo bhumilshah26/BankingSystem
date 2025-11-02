@@ -5,13 +5,16 @@ import LoadingSpinner from './LoadingSpinner'
 import InlineLoading from './InlineLoading'
 
 const ModalWrapper = ({ children, onClose, type }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-2 sm:px-0">
-    <div className={`bg-white rounded-lg shadow-lg w-full ${type === 'Bank Statements' ? 'max-w-xl' : 'max-w-md'} sm:max-w-xs md:max-w-md xl:max-w-xl p-3 sm:p-6 relative`}>
+  <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 px-2 sm:px-0 animate-fade-in">
+    <div className={`card-modern w-full ${type === 'Bank Statements' ? 'max-w-4xl' : 'max-w-lg'} p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto`}>
       <button
-        className="absolute top-2 right-3 text-gray-500 hover:text-red-600 text-lg sm:text-xl"
+        className="absolute top-4 right-4 text-gray-400 hover:text-danger transition p-1 rounded-full hover:bg-gray-100"
         onClick={onClose}
+        aria-label="Close"
       >
-        ✖
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
       {children}
     </div>
@@ -145,19 +148,25 @@ const Modals = ({ type, onClose }) => {
       return (
         <>
           <ModalWrapper onClose={onClose}>
-            <h2 className="text-xl font-bold mb-4 text-[#832625]">Create Account</h2>
-            <form className="space-y-4" onSubmit={handleCreateAccount}>
-              <input type="text" placeholder="User ID" readOnly value={user_id} className="w-full border rounded p-2 text-gray-700" />
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Create New Account</h2>
+              <p className="text-gray-600 text-sm">Add a new savings or current account</p>
+            </div>
+            <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); handleCreateAccount(); }}>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">User ID</label>
+                <input type="text" readOnly value={user_id} className="input-modern bg-gray-50" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
                 <input 
                   type="number" 
-                  placeholder="Account Number" 
+                  placeholder="Enter 12-digit account number (starts with 15)" 
                   required  
                   onChange={(e)=>{
                     const value = e.target.value;
                     setAccount_number(value);
                     
-                    // Clear error when user starts typing
                     if (value.length > 0) {
                       if (!/^15\d{10}$/.test(value)) {
                         setAccountNumberError('Account number must start with 15 and be exactly 12 digits');
@@ -168,20 +177,30 @@ const Modals = ({ type, onClose }) => {
                       setAccountNumberError('');
                     }
                   }}
-                  className={`w-full border rounded p-2 ${accountNumberError ? 'border-red-500' : ''}`}
+                  className={`input-modern ${accountNumberError ? 'border-danger ring-2 ring-danger' : ''}`}
                 />
-                <p className="text-xs text-gray-500 mt-1">Account number must start with '15' and be exactly 12 digits (e.g., 151234567890)</p>
-                {accountNumberError && (
-                  <p className="text-xs text-red-500 mt-1">{accountNumberError}</p>
+                {accountNumberError ? (
+                  <p className="text-xs text-danger mt-1">{accountNumberError}</p>
+                ) : (
+                  <p className="text-xs text-gray-500 mt-1">Format: 15XXXXXXXXXX (12 digits total)</p>
                 )}
               </div>
-              <div className="flex space-x-4">
-                <label><input type="radio" name="accountType" value="Savings" required onClick={(e) => {setAccount_Type("savings")}} /> Savings</label>
-                <label><input type="radio" name="accountType" value="Current" required onClick={(e) => {setAccount_Type("current")}}/> Current</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Account Type</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className={`border-2 rounded-lg p-4 cursor-pointer transition ${account_type === 'savings' ? 'border-primary bg-light' : 'border-gray-300 hover:border-gray-400'}`}>
+                    <input type="radio" name="accountType" value="Savings" required onClick={() => setAccount_Type("savings")} className="mr-2" />
+                    <span className="font-medium">Savings</span>
+                  </label>
+                  <label className={`border-2 rounded-lg p-4 cursor-pointer transition ${account_type === 'current' ? 'border-primary bg-light' : 'border-gray-300 hover:border-gray-400'}`}>
+                    <input type="radio" name="accountType" value="Current" required onClick={() => setAccount_Type("current")} className="mr-2" />
+                    <span className="font-medium">Current</span>
+                  </label>
+                </div>
               </div>
               <button 
                 disabled={isLoading || accountNumberError}
-                className="bg-[#832625] text-[#e5cbcb] w-full py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
@@ -189,7 +208,7 @@ const Modals = ({ type, onClose }) => {
                     <span className="ml-2">Creating Account...</span>
                   </>
                 ) : (
-                  "Submit"
+                  "Create Account"
                 )}
               </button>
             </form>
@@ -241,25 +260,27 @@ const Modals = ({ type, onClose }) => {
       return (
         <>
           <ModalWrapper onClose={onClose} type={type}>
-            <h2 className="text-xl font-bold mb-4 text-[#832625]">Bank Statements</h2>
-            <form className="space-y-4" onSubmit={handleBankStatements}>
-
-              <select required className="w-full border rounded p-2" onChange={(e)=>{ setStatements([]); setBaccount(parseInt(e.target.value))}}>
-                <option value="" defaultValue={statements[0]}>Select Account Number</option>
-                {accountNumbers.map((acc) => {
-
-                return (
-                  <option key={acc.account_number}>
-                    {`${acc.account_number} Balance: ₹${acc.balance}`}
-                  </option>
-                  );
-                })}
-              </select>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Account Statements</h2>
+              <p className="text-gray-600 text-sm">View your transaction history</p>
+            </div>
+            <form className="space-y-4 mb-6" onSubmit={handleBankStatements}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Account</label>
+                <select required className="input-modern" onChange={(e)=>{ setStatements([]); setBaccount(parseInt(e.target.value))}}>
+                  <option value="">Choose an account...</option>
+                  {accountNumbers.map((acc) => (
+                    <option key={acc.account_number} value={acc.account_number}>
+                      {`${acc.account_number} - Balance: ₹${acc.balance.toLocaleString('en-IN')}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <button 
                 type="submit" 
                 disabled={isLoadingStatements}
-                className="bg-[#832625] text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoadingStatements ? (
                   <>
@@ -267,32 +288,43 @@ const Modals = ({ type, onClose }) => {
                     <span className="ml-2">Loading Statements...</span>
                   </>
                 ) : (
-                  "Get Account Statement"
+                  "Get Statements"
                 )}
               </button>
             </form>
-            <div className="bg-gray-100 p-4 mt-4 rounded space-y-3 max-h-96 overflow-y-auto">
-              {statements.length === 0 ? (
-                <p className="text-gray-500">No statements available.</p>
-              ) : (
-                statements.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between bg-white p-3 rounded shadow-sm">
-                    <div className="flex items-center space-x-3">
-                      <span className={`w-3 h-3 rounded-full ${getStatusDotColor(item.status)}`}></span>
-                      <div>
-                        {item.type === "transfer" && <p>{item.transfer_type}</p> }
-                        {item.type === "transaction" && <p>{item.transaction_type}</p> }
-                        <p className="font-medium">{item.description}</p>
-                        <p className="text-sm text-gray-500">{item.time}</p>
+            <div className="border-t border-gray-200 pt-4">
+              <h3 className="font-semibold text-gray-800 mb-4">Transaction History</h3>
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {statements.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <p>No statements available. Select an account and click "Get Statements" to view history.</p>
+                  </div>
+                ) : (
+                  statements.map((item, index) => (
+                    <div key={index} className="card-modern p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3 flex-1">
+                          <span className={`w-3 h-3 rounded-full ${getStatusDotColor(item.status)}`}></span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2 mb-1">
+                              {item.type === "transfer" && <span className="text-xs font-medium text-primary bg-light px-2 py-1 rounded">Transfer</span>}
+                              {item.type === "transaction" && <span className="text-xs font-medium text-success bg-green-100 px-2 py-1 rounded">{item.transaction_type}</span>}
+                            </div>
+                            <p className="font-semibold text-gray-800">{item.description || 'No description'}</p>
+                            <p className="text-xs text-gray-500 mt-1">{item.time}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-4">
+                          <span className={`font-bold ${item.direction === "in" ? "text-success" : "text-danger"}`}>
+                            {item.direction === "in" ? "+" : "-"}₹{item.amount.toLocaleString('en-IN')}
+                          </span>
+                          {getArrowIcon(item.direction === "in")}
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center">
-                      <span className="font-semibold">₹{item.amount}</span>
-                      {getArrowIcon(item.direction === "in")}
-                    </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </ModalWrapper>
           <LoadingSpinner isLoading={isLoadingStatements} />
@@ -324,37 +356,73 @@ const Modals = ({ type, onClose }) => {
       return (
         <>
           <ModalWrapper onClose={onClose}>
-            <h2 className="text-xl font-bold mb-4 text-[#832625]">Deposit/Withdrawal</h2>
-            <form className="space-y-4" onSubmit={handleTransactions}>
-
-              <input type="number" placeholder="Account Number" required onKeyDown={handleKeyDown}
-              className="w-full border rounded p-2" onChange={(e) => {setTaccount(parseInt(e.target.value))}} />
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Deposit / Withdrawal</h2>
+              <p className="text-gray-600 text-sm">Process deposits or withdrawals</p>
+            </div>
+            <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); handleTransactions(); }}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
+                <input 
+                  type="number" 
+                  placeholder="Enter 12-digit account number" 
+                  required 
+                  onKeyDown={handleKeyDown}
+                  className="input-modern" 
+                  onChange={(e) => {setTaccount(parseInt(e.target.value))}} 
+                />
+              </div>
     
-              <input type="number" step="0.01" placeholder="Amount" required onKeyDown={handleKeyDown}
-              className="w-full border rounded p-2" onChange={(e) => {setTamount(e.target.value)}} />
-
-              <div className="flex space-x-4">
-                <label><input type="radio" name="txnType" value="Deposit" required onClick={(e) => {setTtype("deposit")}} /> Deposit</label>
-                <label><input type="radio" name="txnType" value="Withdrawal" required  onClick={(e) => {setTtype("withdrawal")}}/> Withdrawal</label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="Enter amount" 
+                  required 
+                  onKeyDown={handleKeyDown}
+                  className="input-modern" 
+                  onChange={(e) => {setTamount(e.target.value)}} 
+                />
               </div>
 
-              <input type="text" placeholder="Description (Optional)" onChange={(e)=> {setTdesc(e.target.value)}}
-              className="w-full border rounded p-2" />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Transaction Type</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className={`border-2 rounded-lg p-4 cursor-pointer transition ${ttype === 'deposit' ? 'border-success bg-green-50' : 'border-gray-300 hover:border-gray-400'}`}>
+                    <input type="radio" name="txnType" value="Deposit" required onClick={() => setTtype("deposit")} className="mr-2" />
+                    <span className="font-medium">Deposit</span>
+                  </label>
+                  <label className={`border-2 rounded-lg p-4 cursor-pointer transition ${ttype === 'withdrawal' ? 'border-danger bg-red-50' : 'border-gray-300 hover:border-gray-400'}`}>
+                    <input type="radio" name="txnType" value="Withdrawal" required onClick={() => setTtype("withdrawal")} className="mr-2" />
+                    <span className="font-medium">Withdrawal</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+                <input 
+                  type="text" 
+                  placeholder="Add a note about this transaction" 
+                  onChange={(e)=> {setTdesc(e.target.value)}}
+                  className="input-modern" 
+                />
+              </div>
 
               <button 
                 disabled={isLoadingTransaction}
-                className="bg-[#832625] text-[#e5cbcb] w-full py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoadingTransaction ? (
                   <>
                     <InlineLoading size="small" />
-                    <span className="ml-2">Processing Transaction...</span>
+                    <span className="ml-2">Processing...</span>
                   </>
                 ) : (
-                  "Submit"
+                  "Process Transaction"
                 )}
               </button>
-
             </form>
           </ModalWrapper>
           <LoadingSpinner isLoading={isLoadingTransaction} />
@@ -386,29 +454,64 @@ const Modals = ({ type, onClose }) => {
       return (
         <>
           <ModalWrapper onClose={onClose}>
-            <h2 className="text-xl font-bold mb-4 text-[#832625]">Funds Transfer</h2>
-            <form className="space-y-4" onSubmit={handleFundsTransfer}>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Funds Transfer</h2>
+              <p className="text-gray-600 text-sm">Transfer money to another account</p>
+            </div>
+            <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); handleFundsTransfer(); }}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Beneficiary Account Number</label>
+                <input 
+                  type="number" 
+                  maxLength={12} 
+                  placeholder="Enter recipient's 12-digit account number" 
+                  required 
+                  onKeyDown={handleKeyDown}
+                  className="input-modern" 
+                  onChange={(e)=>{setBan(parseInt(e.target.value))}}
+                />
+              </div>
 
-              <input type="number" maxLength={12} placeholder="Beneficiary Account Number" required onKeyDown={handleKeyDown}
-              className="w-full border rounded p-2" onChange={(e)=>{setBan(parseInt(e.target.value))}}/>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">From Account</label>
+                <select required className="input-modern" onChange={(e)=>{setSan(parseInt(e.target.value))}}>
+                  <option value="" disabled>Select your account</option>
+                  {accountNumbers.map((acc) => (
+                    <option key={acc.account_number} value={acc.account_number}>
+                      {`${acc.account_number} - Balance: ₹${acc.balance.toLocaleString('en-IN')}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <select required className="w-full border rounded p-2" onChange={(e)=>{
-                    setSan(parseInt(e.target.value));
-                  }
-                }>
-                <option value="" disabled>Select Your Account Number</option>
-                {accountNumbers.map((acc) => <option key={acc.account_number}>{acc.account_number}</option>)}
-              </select>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Transfer Amount</label>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="Enter amount (₹1 - ₹10,00,000)" 
+                  required 
+                  min={1} 
+                  max={1000000} 
+                  onKeyDown={handleKeyDown}
+                  className="input-modern" 
+                  onChange={(e)=>{setFtamount(parseFloat(e.target.value))}} 
+                />
+              </div>
 
-              <input type="number" step="0.01" placeholder="Amount" required min={1} max={1000000} onKeyDown={handleKeyDown}
-              className="w-full border rounded p-2" onChange={(e)=>{setFtamount(parseFloat(e.target.value))}} />
-
-              <input type="text" placeholder="Description (Optional)" 
-              className="w-full border rounded p-2" onChange={(e)=>{setFtdesc(e.target.value)}}/>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+                <input 
+                  type="text" 
+                  placeholder="Add a note about this transfer" 
+                  className="input-modern" 
+                  onChange={(e)=>{setFtdesc(e.target.value)}}
+                />
+              </div>
 
               <button 
                 disabled={isLoadingTransfer}
-                className="bg-[#832625] text-[#e5cbcb] w-full py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoadingTransfer ? (
                   <>
@@ -416,7 +519,7 @@ const Modals = ({ type, onClose }) => {
                     <span className="ml-2">Processing Transfer...</span>
                   </>
                 ) : (
-                  "Submit"
+                  "Transfer Funds"
                 )}
               </button>
             </form>
@@ -428,13 +531,29 @@ const Modals = ({ type, onClose }) => {
     case "Cards":
       return (
         <ModalWrapper onClose={onClose}>
-          <h2 className="text-xl font-bold mb-4 text-[#832625]">Cards</h2>
-          <div className="space-y-4">
-            <div className="flex space-x-4">
-              <label><input type="radio" name="cardType" value="Debit" required /> Debit</label>
-              <label><input type="radio" name="cardType" value="Credit" required /> Credit</label>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Banking Cards</h2>
+            <p className="text-gray-600 text-sm">Apply for debit or credit cards</p>
+          </div>
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Card Type</label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="border-2 rounded-lg p-4 cursor-pointer transition border-gray-300 hover:border-primary">
+                  <input type="radio" name="cardType" value="Debit" required className="mr-2" />
+                  <span className="font-medium">Debit Card</span>
+                </label>
+                <label className="border-2 rounded-lg p-4 cursor-pointer transition border-gray-300 hover:border-primary">
+                  <input type="radio" name="cardType" value="Credit" required className="mr-2" />
+                  <span className="font-medium">Credit Card</span>
+                </label>
+              </div>
             </div>
-            <p className="text-gray-700">Please visit your nearest branch for further processing.</p>
+            <div className="bg-light border border-gray-300 rounded-lg p-4">
+              <p className="text-gray-700 text-sm">
+                <strong>Note:</strong> Please visit your nearest branch for card application and further processing.
+              </p>
+            </div>
           </div>
         </ModalWrapper>
       );
@@ -471,9 +590,11 @@ const Modals = ({ type, onClose }) => {
 
         return (
           <ModalWrapper onClose={onClose}>
-            <h2 className="text-xl font-bold text-[#832625]">Loans</h2>
-            <div className="text-gray-500">Click on calculate</div> <br/>
-            <div className="space-y-4">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Loan Calculator</h2>
+              <p className="text-gray-600 text-sm">Calculate your EMI and interest</p>
+            </div>
+            <div className="space-y-5">
               <div className="flex items-center space-x-2">
                 <select
                   required
@@ -519,13 +640,28 @@ const Modals = ({ type, onClose }) => {
                 min={0}
                 onChange={(e) => { setNoofloanmonths(e.target.value); }}
               />
-              <div className="bg-gray-100 p-4 mt-2 rounded font-bold">
-                Your monthly emi is calculated to be ₹{emi.toFixed(2)}.<br/>
-                Your principal amount is ₹{parseFloat(principalLoanAmount).toFixed(2)}.<br/>
-                Your total interest is ₹{parseFloat((total - principalLoanAmount) > 0 ? (total - principalLoanAmount) : 0).toFixed(2)}.<br />
-                Your total amount is ₹{parseFloat(total).toFixed(2)}. <br />
+              <div className="bg-light border border-gray-300 p-5 mt-2 rounded-lg">
+                <h4 className="font-bold text-gray-800 mb-3">Calculation Results:</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Monthly EMI:</span>
+                    <span className="font-bold text-primary">₹{emi.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Principal Amount:</span>
+                    <span className="font-semibold">₹{parseFloat(principalLoanAmount).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Interest:</span>
+                    <span className="font-semibold text-warning">₹{parseFloat((total - principalLoanAmount) > 0 ? (total - principalLoanAmount) : 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-gray-300">
+                    <span className="text-gray-700 font-semibold">Total Amount:</span>
+                    <span className="font-bold text-success">₹{parseFloat(total).toFixed(2)}</span>
+                  </div>
+                </div>
               </div>
-              <button onClick={calculateEMI} className="bg-[#832625] text-[#e5cbcb] w-full py-2 rounded">Calculate</button>
+              <button onClick={calculateEMI} className="btn-primary w-full">Calculate EMI</button>
             </div>
           </ModalWrapper>
         );
@@ -546,9 +682,11 @@ const Modals = ({ type, onClose }) => {
       }
       return (
         <ModalWrapper onClose={onClose}>
-          <h2 className="text-xl font-bold   text-[#832625]">Investments</h2>
-          <div className="text-gray-500">Click on calculate</div> <br/>
-          <div className="space-y-4">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Investment Calculator</h2>
+            <p className="text-gray-600 text-sm">Calculate returns on your investments</p>
+          </div>
+          <div className="space-y-5">
             <div className="flex items-center">
               <input type="number" placeholder="Rate of Interest" required className="w-full border rounded p-2"  min={0}
               onChange={(e) => {setRoi(e.target.value)}}/>
@@ -569,18 +707,39 @@ const Modals = ({ type, onClose }) => {
             <input type="number" placeholder="No. of Months" required min={0} max={11}
              className="w-full border rounded p-2" onChange={(e) => {setNoofmonths(e.target.value);}}/>
 
-            <div className="bg-gray-100 p-4 mt-2 rounded">
-              {simple && <div className="font-bold"> Simple Interest Calculation: <br/>
-                    Total Interest over {nooyears} year/s and {noofmonths > 0 ? `${noofmonths} month/s` : ''} <br/>
-                    Maturity Amount = ₹{(si + parseFloat(amount)).toFixed(2)}
-              </div>}
-              {!simple && <div className="font-bold"> Compound Interest Calculation: <br/>
-                    Total Interest over {nooyears} year/s and {noofmonths} month/s <br/>
-                    Maturity Amount = ₹{(ci).toFixed(2)}
-              
-              </div>}
-              </div>
-            <button onClick={() => {simple ? simpleInt() : compoundInt()}} className="bg-[#832625] text-[#e5cbcb] w-full py-2 rounded">Calculate</button>
+            <div className="bg-light border border-gray-300 p-5 mt-2 rounded-lg">
+              <h4 className="font-bold text-gray-800 mb-3">
+                {simple ? 'Simple Interest Calculation' : 'Compound Interest Calculation'}
+              </h4>
+              {simple ? (
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Interest:</span>
+                    <span className="font-semibold text-warning">₹{si.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Duration:</span>
+                    <span className="font-semibold">{nooyears} year(s) {noofmonths > 0 ? `and ${noofmonths} month(s)` : ''}</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-gray-300">
+                    <span className="text-gray-700 font-semibold">Maturity Amount:</span>
+                    <span className="font-bold text-success">₹{(si + parseFloat(amount || 0)).toFixed(2)}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Duration:</span>
+                    <span className="font-semibold">{nooyears} year(s) {noofmonths > 0 ? `and ${noofmonths} month(s)` : ''}</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-gray-300">
+                    <span className="text-gray-700 font-semibold">Maturity Amount:</span>
+                    <span className="font-bold text-success">₹{(ci || 0).toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <button onClick={() => {simple ? simpleInt() : compoundInt()}} className="btn-primary w-full">Calculate Returns</button>
           </div>
         </ModalWrapper>
       );
@@ -588,11 +747,28 @@ const Modals = ({ type, onClose }) => {
     case "Crypto":
       return (
         <ModalWrapper onClose={onClose}>
-          <h2 className="text-xl font-bold mb-4 text-[#832625]">Crypto</h2>
-          <div className="flex justify-around text-4xl">
-            <span>₿</span>
-            <span>Ξ</span>
-            <span>Ð</span>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Cryptocurrency</h2>
+            <p className="text-gray-600 text-sm">Explore digital currency options</p>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="card-modern p-6 text-center">
+              <div className="text-4xl mb-2">₿</div>
+              <p className="font-semibold text-gray-800">Bitcoin</p>
+            </div>
+            <div className="card-modern p-6 text-center">
+              <div className="text-4xl mb-2">Ξ</div>
+              <p className="font-semibold text-gray-800">Ethereum</p>
+            </div>
+            <div className="card-modern p-6 text-center">
+              <div className="text-4xl mb-2">Ð</div>
+              <p className="font-semibold text-gray-800">Dogecoin</p>
+            </div>
+          </div>
+          <div className="mt-6 bg-light border border-gray-300 rounded-lg p-4">
+            <p className="text-gray-700 text-sm">
+              <strong>Coming Soon:</strong> Cryptocurrency services will be available soon. Stay tuned!
+            </p>
           </div>
         </ModalWrapper>
       );

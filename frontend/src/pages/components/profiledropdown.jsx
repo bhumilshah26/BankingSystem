@@ -121,32 +121,32 @@ const ProfileDropdown = () => {
     <div className="relative ml-5" ref={dropdownRef}>
       <FaUserCircle 
         size={32} 
-        className="text-[#832625] cursor-pointer hover:text-[#6b1f1d] transition" 
+        className="text-primary cursor-pointer hover:text-dark transition" 
         onClick={() => setIsOpen(!isOpen)} 
       />
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white border border-[#832625] rounded shadow-lg z-50 p-4 text-sm">
-          <h3 className="text-[#832625] font-bold mb-2 text-lg">Details</h3>
+        <div className="absolute right-0 mt-2 w-64 bg-white border border-primary rounded shadow-lg z-50 p-4 text-sm">
+          <h3 className="text-primary font-bold mb-2 text-lg">Details</h3>
           <p><strong className='text-base'>Name:</strong> {userDetails.name}</p>
           <p><strong className='text-base'>Email:</strong> {userDetails.email}</p>
           <p><strong className='text-base'>ID:</strong> {userDetails.user_id}</p>
           <div className="mt-4 flex flex-col gap-2">
             <button 
               onClick={() => setShowChangePassword(true)}
-              className="px-3 py-1 bg-[#832625] text-white rounded hover:bg-[#6b1f1d] transition flex items-center justify-center"
+              className="px-3 py-1 bg-primary text-white rounded hover:bg-dark transition flex items-center justify-center"
             >
               <FaKey className="mr-2" />
               Change Password
             </button>
             <button 
               onClick={handleDeleteAccount} 
-              className="px-3 py-1 bg-[#832625] text-white rounded hover:bg-red-700 transition"
+              className="px-3 py-1 bg-primary text-white rounded hover:bg-danger transition"
             >
               Delete Account
             </button>
             <button 
               onClick={handleLogout} 
-              className="px-3 py-1 bg-[#832625] text-[#e5cbcb] rounded hover:bg-[#6b1f1d] transition"
+              className="px-3 py-1 bg-primary text-light rounded hover:bg-dark transition"
             >
               Logout
             </button>

@@ -1,90 +1,107 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none; 
-}
-
-body::-webkit-scrollbar {
-  display: none; 
-}
-
-html::-webkit-scrollbar {
-  display: none; 
-}
-
-#root::-webkit-scrollbar {
-  display: none; 
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent horizontal scrolling */
-html {
-  overflow-x: hidden;
-}
+@layer base {
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #ffffff;
+    min-height: 100vh;
+  }
 
-#root {
-  overflow-x: hidden;
-  width: 100%;
-}
+  html {
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
 
-/* Ensure responsive design works properly */
-* {
-  box-sizing: border-box;
-}
+  #root {
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 100vh;
+  }
 
-/* Responsive container utilities */
-.container-responsive {
-  width: 100%;
-  max-width: 100%;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-left: auto;
-  margin-right: auto;
-}
+  * {
+    box-sizing: border-box;
+  }
 
-@media (min-width: 640px) {
-  .container-responsive {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }
 
-@media (min-width: 768px) {
+@layer components {
+  .card-modern {
+    @apply bg-white rounded-lg shadow-card hover:shadow-card-hover transition-shadow duration-200;
+  }
+
+  .input-modern {
+    @apply w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-200;
+  }
+
+  .btn-primary {
+    @apply bg-primary hover:bg-dark text-white font-semibold py-3 px-6 rounded transition-colors duration-200 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-primary font-semibold py-3 px-6 rounded border border-primary transition-colors duration-200;
+  }
+
+  .text-responsive {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
   .container-responsive {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    @apply w-full max-w-full px-4 sm:px-6 lg:px-8 mx-auto;
   }
 }
 
-@media (min-width: 1024px) {
-  .container-responsive {
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Ensure images don't overflow */
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Ensure text doesn't overflow on small screens */
-.text-responsive {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
 }

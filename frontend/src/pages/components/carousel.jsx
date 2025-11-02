@@ -27,7 +27,7 @@ const Carousel = () => {
 
   return (
     <div className="w-full max-w-full">
-      <div className="relative w-full h-[180px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden bg-[#e5cbcb] rounded-md sm:rounded-2xl">
+      <div className="relative w-full h-[180px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden bg-light rounded-md sm:rounded-2xl">
         <div
           className="flex h-full transition-transform duration-700 ease-in-out"
           style={{
@@ -36,7 +36,7 @@ const Carousel = () => {
           }}
         >
           {slides.map((slide) => (
-            <div key={slide.id} className="w-full h-full flex items-center justify-center bg-[#e5cbcb]"> 
+            <div key={slide.id} className="w-full h-full flex items-center justify-center bg-light"> 
               <img
                 src={slide.image}
                 alt={slide.title}
@@ -46,14 +46,15 @@ const Carousel = () => {
           ))}
         </div>
 
-        <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 md:bottom-5 md:left-5 bg-[#832625] bg-opacity-80 text-[#e5cbcb] px-2 md:px-3 py-1 md:py-2 rounded-md text-xs sm:text-sm md:text-base font-semibold shadow-md max-w-[90%]">
+        {/* Slide Title Overlay */}
+        <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3 md:bottom-5 md:left-5 bg-primary bg-opacity-90 text-light px-2 md:px-3 py-1 md:py-2 rounded-md text-xs sm:text-sm md:text-base font-semibold shadow-md max-w-[90%]">
           {slides[currentSlide].title}
         </div>
 
         {/* Left Arrow */}
         <button
           onClick={prevSlide}
-          className="absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-[#e5cbcb] text-[#832625] p-1 sm:p-2 md:p-3 rounded-full shadow hover:bg-opacity-75 transition text-lg sm:text-xl md:text-2xl"
+          className="absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-light text-primary p-1 sm:p-2 md:p-3 rounded-full shadow hover:bg-opacity-90 transition text-lg sm:text-xl md:text-2xl"
         >
           ‹
         </button>
@@ -61,7 +62,7 @@ const Carousel = () => {
         {/* Right Arrow */}
         <button
           onClick={nextSlide}
-          className="absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-[#e5cbcb] text-[#832625] p-1 sm:p-2 md:p-3 rounded-full shadow hover:bg-opacity-75 transition text-lg sm:text-xl md:text-2xl"
+          className="absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-light text-primary p-1 sm:p-2 md:p-3 rounded-full shadow hover:bg-opacity-90 transition text-lg sm:text-xl md:text-2xl"
         >
           ›
         </button>
