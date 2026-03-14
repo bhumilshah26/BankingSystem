@@ -59,7 +59,7 @@ const Login = () => {
               onKeyDown={handleKeyDown}
               className="input-modern"
               type="text"
-              placeholder="User ID"
+              placeholder="User ID (test :bhumilshah)"
               onChange={(e) => { setUserid(e.target.value); }}
             />
           </div>
@@ -71,7 +71,7 @@ const Login = () => {
                 onKeyDown={handleKeyDown}
                 className="input-modern pr-12"
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder="Password (test :pass@123)"
                 onChange={(e) => { setPassword(e.target.value); }}
               />
               <button
@@ -114,7 +114,13 @@ const Login = () => {
         </div>
         </div>
       </div>
-
+      {/* Important Note */}
+      <div className="mt-6 flex justify-center">
+        <div className="max-w-md rounded-md border border-yellow-400 bg-yellow-50 px-4 py-3 text-center text-sm text-yellow-800">
+          <span className="font-semibold">Important:</span> Requests may take some time to process.
+          Please wait while the system completes your request.
+        </div>
+      </div>
       <LoadingSpinner isLoading={isLoading} />
     </div>
   );
