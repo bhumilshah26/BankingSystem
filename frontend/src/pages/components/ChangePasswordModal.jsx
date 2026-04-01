@@ -39,7 +39,7 @@ const ChangePasswordModal = ({ isOpen, onClose, onSuccess }) => {
 
     try {
       const user_id = localStorage.getItem('user_id');
-      const response = await api.post('/users/change-password', {
+      await api.post('/users/change-password', {
         user_id,
         currentPassword,
         newPassword
