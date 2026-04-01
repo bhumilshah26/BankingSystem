@@ -59,7 +59,7 @@ const Login = () => {
               onKeyDown={handleKeyDown}
               className="input-modern"
               type="text"
-              placeholder="User ID (test :bhumilshah)"
+              placeholder="User ID (test: bhumilshah)"
               onChange={(e) => { setUserid(e.target.value); }}
             />
           </div>
@@ -71,7 +71,7 @@ const Login = () => {
                 onKeyDown={handleKeyDown}
                 className="input-modern pr-12"
                 type={showPassword ? "text" : "password"}
-                placeholder="Password (test :pass@123)"
+                placeholder="Password (test: pass@123)"
                 onChange={(e) => { setPassword(e.target.value); }}
               />
               <button
