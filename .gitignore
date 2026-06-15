@@ -4,6 +4,8 @@ backend/.env
 
 frontend/node_modules
 frontend/package-lock.json
+frontend/.env
+frontend/.env.local
 
 /PASSWORD_RESET_SETUP.md
 /BSNB_Banking_System_Project.pdf

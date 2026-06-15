@@ -28,7 +28,9 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (e) {
-      return alert(e.response.data.message);
+      const message = e.response?.data?.message
+        || (e.response ? 'Login failed. Please try again.' : 'Cannot reach the server. Please check your connection and try again.');
+      return alert(message);
     } finally {
       setIsLoading(false);
     }
