@@ -3,7 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   // Backend URL comes from frontend/.env (REACT_APP_BACKEND_URL).
   // Falls back to localhost for local development.
-  baseURL: 'http://localhost:5000',
+  baseURL: process.env.REACT_APP_BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },
