@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
+import { FaBitcoin, FaEthereum, FaCoins } from 'react-icons/fa';
+import ThemedSelect from './ThemedSelect';
 import api from '../../api'
 import LoadingSpinner from './LoadingSpinner'
 import InlineLoading from './InlineLoading'
@@ -267,14 +269,15 @@ const Modals = ({ type, onClose }) => {
             <form className="space-y-4 mb-6" onSubmit={handleBankStatements}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Select Account</label>
-                <select required className="input-modern" onChange={(e)=>{ setStatements([]); setBaccount(parseInt(e.target.value))}}>
-                  <option value="">Choose an account...</option>
-                  {accountNumbers.map((acc) => (
-                    <option key={acc.account_number} value={acc.account_number}>
-                      {`${acc.account_number} - Balance: ₹${acc.balance.toLocaleString('en-IN')}`}
-                    </option>
-                  ))}
-                </select>
+                <ThemedSelect
+                  value={baccount || ''}
+                  onChange={(v) => { setStatements([]); setBaccount(parseInt(v)); }}
+                  placeholder="Choose an account..."
+                  options={accountNumbers.map((acc) => ({
+                    value: acc.account_number,
+                    label: `${acc.account_number} — Balance: ₹${acc.balance.toLocaleString('en-IN')}`,
+                  }))}
+                />
               </div>
 
               <button 
@@ -474,14 +477,15 @@ const Modals = ({ type, onClose }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">From Account</label>
-                <select required className="input-modern" onChange={(e)=>{setSan(parseInt(e.target.value))}}>
-                  <option value="" disabled>Select your account</option>
-                  {accountNumbers.map((acc) => (
-                    <option key={acc.account_number} value={acc.account_number}>
-                      {`${acc.account_number} - Balance: ₹${acc.balance.toLocaleString('en-IN')}`}
-                    </option>
-                  ))}
-                </select>
+                <ThemedSelect
+                  value={san || ''}
+                  onChange={(v) => setSan(parseInt(v))}
+                  placeholder="Select your account"
+                  options={accountNumbers.map((acc) => ({
+                    value: acc.account_number,
+                    label: `${acc.account_number} — Balance: ₹${acc.balance.toLocaleString('en-IN')}`,
+                  }))}
+                />
               </div>
 
               <div>
@@ -595,51 +599,61 @@ const Modals = ({ type, onClose }) => {
               <p className="text-gray-600 text-sm">Calculate your EMI and interest</p>
             </div>
             <div className="space-y-5">
-              <div className="flex items-center space-x-2">
-                <select
-                  required
-                  className="w-full border rounded p-2"
-                  value={loanType}
-                  onChange={(e) => setLoanType(e.target.value)}
-                >
-                  <option value="">Select Loan Type</option>
-                  <option value="Home">Home</option>
-                  <option value="Education">Education</option>
-                  <option value="Car">Car</option>
-                  <option value="Business">Business</option>
-                </select>
-                <input
-                  type="text"
-                  readOnly
-                  className="w-36 border bg-gray-100 rounded p-2 text-center"
-                  value={loanType ? `${calculateInterest()}%` : ""}
-                  placeholder="Annual Interest %"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-start">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Loan Type</label>
+                  <ThemedSelect
+                    value={loanType}
+                    onChange={(v) => setLoanType(v)}
+                    placeholder="Select loan type"
+                    options={[
+                      { value: 'Home', label: 'Home Loan' },
+                      { value: 'Education', label: 'Education Loan' },
+                      { value: 'Car', label: 'Car Loan' },
+                      { value: 'Business', label: 'Business Loan' },
+                    ]}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Annual Rate</label>
+                  <div className="input-modern w-full sm:w-32 bg-primary-50 border-primary-100 text-primary font-semibold text-center">
+                    {loanType ? `${calculateInterest()}%` : '—'}
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
+
+              <label className="flex items-center gap-3 cursor-pointer select-none">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="senior"
-                  onClick={() => setIsSenior(!isSenior)}
+                  onChange={() => setIsSenior(!isSenior)}
                   checked={isSenior}
+                  className="w-4 h-4 accent-primary rounded"
                 />
-                <label>Senior Citizen (-0.5%)</label>
+                <span className="text-sm text-ink">Senior Citizen <span className="text-success font-medium">(-0.5%)</span></span>
+              </label>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Requested Amount</label>
+                <input
+                  type="number"
+                  placeholder="Enter amount"
+                  required
+                  className="input-modern"
+                  onChange={(e) => { setPrincipalLoanAmount(e.target.value); }}
+                />
               </div>
-              <input
-                type="number"
-                placeholder="Requested Amount"
-                required
-                className="w-full border rounded p-2"
-                onChange={(e) => { setPrincipalLoanAmount(e.target.value); } }
-              />
-              <input
-                type="number"
-                placeholder="Number of Months"
-                required
-                className="w-full border rounded p-2"
-                min={0}
-                onChange={(e) => { setNoofloanmonths(e.target.value); }}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Number of Months</label>
+                <input
+                  type="number"
+                  placeholder="Enter tenure in months"
+                  required
+                  className="input-modern"
+                  min={0}
+                  onChange={(e) => { setNoofloanmonths(e.target.value); }}
+                />
+              </div>
               <div className="bg-light border border-gray-300 p-5 mt-2 rounded-lg">
                 <h4 className="font-bold text-gray-800 mb-3">Calculation Results:</h4>
                 <div className="space-y-2 text-sm">
@@ -752,17 +766,17 @@ const Modals = ({ type, onClose }) => {
             <p className="text-gray-600 text-sm">Explore digital currency options</p>
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <div className="card-modern p-6 text-center">
-              <div className="text-4xl mb-2">₿</div>
-              <p className="font-semibold text-gray-800">Bitcoin</p>
+            <div className="card-modern p-6 flex flex-col items-center text-center gap-2">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-amber-50 text-amber-600"><FaBitcoin className="text-2xl" /></span>
+              <p className="font-semibold text-ink">Bitcoin</p>
             </div>
-            <div className="card-modern p-6 text-center">
-              <div className="text-4xl mb-2">Ξ</div>
-              <p className="font-semibold text-gray-800">Ethereum</p>
+            <div className="card-modern p-6 flex flex-col items-center text-center gap-2">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600"><FaEthereum className="text-2xl" /></span>
+              <p className="font-semibold text-ink">Ethereum</p>
             </div>
-            <div className="card-modern p-6 text-center">
-              <div className="text-4xl mb-2">Ð</div>
-              <p className="font-semibold text-gray-800">Dogecoin</p>
+            <div className="card-modern p-6 flex flex-col items-center text-center gap-2">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-yellow-50 text-yellow-600"><FaCoins className="text-2xl" /></span>
+              <p className="font-semibold text-ink">Dogecoin</p>
             </div>
           </div>
           <div className="mt-6 bg-light border border-gray-300 rounded-lg p-4">

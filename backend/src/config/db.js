@@ -1,18 +1,26 @@
-const mysql = require('mysql2');
+const { Pool } = require('pg');
+const config = require('./config');
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  port: process.env.DB_PORT,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  // only 10 users can have a database connection at once
-  connectionLimit: 10,
-  // how many other connections can wait in line while the active connections are busy
-  queueLimit: 0
-});
+// A pool is a network of open connections that can be reused, so requests are
+// less costly and we avoid exhausting the database / crashing under load.
+// When DATABASE_URL is set (Neon), we connect with it directly; otherwise we
+// fall back to the individual PG* fields for local development.
+const pool = new Pool(
+    config.db.connectionString
+        ? {
+            connectionString: config.db.connectionString,
+            ssl: config.db.ssl,
+            max: config.db.max,
+        }
+        : {
+            host: config.db.host,
+            user: config.db.user,
+            password: config.db.password,
+            database: config.db.database,
+            port: config.db.port,
+            ssl: config.db.ssl,
+            max: config.db.max,
+        }
+);
 
-// promise is used to avoid (1. callbacks type) and use async and await(2. modern type)
-// pool is a network of open connections that can be used so that the less costly, time consuming and server crashes
-module.exports = pool.promise();
+module.exports = pool;

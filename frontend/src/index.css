@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,7 +14,8 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-y: auto;
     overflow-x: hidden;
-    background: #ffffff;
+    background: #FAF5F5;
+    color: #1F2937;
     min-height: 100vh;
   }
 
@@ -33,6 +34,12 @@
     box-sizing: border-box;
   }
 
+  /* Display face for headings/brand */
+  h1, h2, .font-display {
+    font-family: 'Sora', 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
   code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
       monospace;
@@ -42,23 +49,40 @@
     max-width: 100%;
     height: auto;
   }
+
+  ::selection {
+    background: #832625;
+    color: #fff;
+  }
 }
 
 @layer components {
   .card-modern {
-    @apply bg-white rounded-lg shadow-card hover:shadow-card-hover transition-shadow duration-200;
+    @apply bg-white rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 border border-primary-100/60;
   }
 
   .input-modern {
-    @apply w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-200;
+    @apply w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-ink placeholder-gray-400
+      focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
   }
 
   .btn-primary {
-    @apply bg-primary hover:bg-dark text-white font-semibold py-3 px-6 rounded transition-colors duration-200 shadow-sm;
+    @apply inline-flex items-center justify-center gap-2 bg-primary hover:bg-dark text-white font-semibold
+      py-3 px-6 rounded-xl transition-all duration-200 shadow-sm hover:shadow-brand
+      focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2
+      active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-y-0;
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-primary font-semibold py-3 px-6 rounded border border-primary transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2 bg-white hover:bg-primary-50 text-primary font-semibold
+      py-3 px-6 rounded-xl border border-primary/40 transition-all duration-200
+      focus:outline-none focus:ring-2 focus:ring-primary/30;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark text-ink font-semibold
+      py-3 px-6 rounded-xl transition-all duration-200 shadow-gold
+      focus:outline-none focus:ring-2 focus:ring-accent/50 active:translate-y-px;
   }
 
   .text-responsive {
@@ -69,39 +93,48 @@
   .container-responsive {
     @apply w-full max-w-full px-4 sm:px-6 lg:px-8 mx-auto;
   }
+
+  /* Eyebrow label with a short gold rule, used sparingly */
+  .section-eyebrow {
+    @apply inline-flex items-center gap-2 text-sm font-semibold text-primary;
+  }
+  .section-eyebrow::before {
+    content: "";
+    @apply h-px w-6 bg-accent;
+  }
 }
 
-/* Custom scrollbar for better UX */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #F2D9D8;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
+  background: #C99A99;
+  border-radius: 8px;
+  border: 2px solid #F2D9D8;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #A03A3C;
 }
 
-/* Smooth animations */
+/* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

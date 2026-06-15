@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://bankingsystem-i75o.onrender.com',
-  // baseURL: 'http://localhost:5000',
+  // Backend URL comes from frontend/.env (REACT_APP_BACKEND_URL).
+  // Falls back to localhost for local development.
+  baseURL: 'http://localhost:5000',
   headers: {
     'Content-Type': 'application/json',
   },

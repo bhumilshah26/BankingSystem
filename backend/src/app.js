@@ -1,7 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 const rateLimit = require('express-rate-limit')
-require('dotenv').config()
+// config loads and validates the .env variables (calls dotenv internally)
+require('./config/config')
 
 // Routes
 const userRoutes = require('./routes/userRoutes');

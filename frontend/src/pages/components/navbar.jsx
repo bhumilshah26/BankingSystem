@@ -1,138 +1,198 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from './profiledropdown';
-import { FaBell } from 'react-icons/fa';
-import { FaBars } from 'react-icons/fa';
-import { FaQuestionCircle } from 'react-icons/fa';
+import { FaBell, FaBars, FaTimes, FaQuestionCircle, FaLandmark, FaChevronDown } from 'react-icons/fa';
+
+// Each top-level item opens a menu of links.
+const navItems = [
+  { title: 'Accounts & Deposits', links: ['Savings Account', 'Current Account', 'Fixed Deposit', 'Recurring Deposit', 'Salary Account'] },
+  { title: 'Cards', links: ['Debit Cards', 'Credit Cards', 'Card Offers', 'Block a Card', 'Rewards'] },
+  { title: 'Loans', links: ['Home Loan', 'Car Loan', 'Personal Loan', 'Education Loan', 'Gold Loan'] },
+  { title: 'Rates & Offers', links: ['Interest Rates', 'Festive Offers', 'Cashback Deals', 'Fee Schedule'] },
+  { title: 'Investments', links: ['Mutual Funds', 'Stocks & ETFs', 'Bonds', 'Insurance', 'Tax Saver'] },
+];
 
 const Navbar = ({ onShowHelp }) => {
   const [token, setToken] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const features2 = [
-      { title: 'Accounts & Deposits' },
-      { title: 'Cards' },
-      { title: 'Loans' },
-      { title: '%Rates & Offers' },
-      { title: 'Investments & Insurance' },
-  ];
+  const [openMobileIdx, setOpenMobileIdx] = useState(null);
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     setToken(localStorage.getItem('token'))
   }, [])
 
+  const Brand = () => (
+    <button
+      onClick={() => navigate(token ? '/dashboard' : '/')}
+      className="flex items-center gap-2.5 group focus:outline-none shrink-0"
+    >
+      <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-primary text-light shadow-sm group-hover:bg-dark transition-colors">
+        <FaLandmark className="text-base" />
+      </span>
+      <span className="leading-tight text-left">
+        <span className="block font-display font-bold text-primary text-base sm:text-lg">BSNB</span>
+        <span className="block text-[10px] sm:text-xs text-gray-500 -mt-0.5">Bhumil Shah National Bank</span>
+      </span>
+    </button>
+  );
 
   return (
-    <div>
-      <nav className="flex justify-between items-center p-3 sm:p-4 shadow-md z-10 relative bg-white w-full">
-        <div className="text-lg sm:text-2xl font-bold text-primary text-responsive">
-          BSNB Bhumil Shah National Bank
-        </div>
+    <nav className="sticky top-0 z-sticky bg-white/90 backdrop-blur border-b border-primary-100">
+      <div className="flex justify-between items-center gap-4 px-3 sm:px-6 py-2.5 max-w-7xl mx-auto w-full">
+        <Brand />
 
-        {/* Hamburger for mobile */}
-        <div className="sm:hidden flex items-center">
-          <button onClick={() => setMenuOpen(!menuOpen)} className="text-primary focus:outline-none">
-            <FaBars size={24} />
-          </button>
-        </div>
+        {/* Desktop nav with dropdowns */}
+        <div className="hidden lg:flex items-center gap-0.5">
+          {navItems.map((item, index) => (
+            <div key={index} className="relative group">
+              <button
+                className="relative flex items-center gap-1 px-3 py-2 text-sm font-medium text-ink/80 group-hover:text-primary transition-colors
+                  after:absolute after:left-3 after:right-3 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-accent
+                  after:scale-x-0 group-hover:after:scale-x-100 after:origin-left after:transition-transform after:duration-300"
+              >
+                {item.title}
+                <FaChevronDown className="text-[9px] opacity-60 transition-transform duration-200 group-hover:rotate-180" />
+              </button>
 
-        {/* Nav links for desktop */}
-        <div className="hidden sm:flex gap-6 ml-4">
-          {features2.map((feature, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-1 text-primary font-medium cursor-pointer hover:text-dark transition text-sm sm:text-base"
-            >
-              <span>{feature.title}</span>
-              <span className="text-xs sm:text-sm">▼</span>
+              {/* Dropdown panel (appears on hover/focus) */}
+              <div
+                className="absolute left-0 top-full pt-2 w-60 opacity-0 invisible translate-y-1
+                  group-hover:opacity-100 group-hover:visible group-hover:translate-y-0
+                  focus-within:opacity-100 focus-within:visible focus-within:translate-y-0
+                  transition-all duration-200 z-dropdown"
+              >
+                <div className="bg-white border border-primary-100 rounded-2xl shadow-card-hover p-2 overflow-hidden">
+                  <p className="px-3 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-wide text-primary/70">{item.title}</p>
+                  {item.links.map((link) => (
+                    <button
+                      key={link}
+                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-ink/80 hover:bg-primary-50 hover:text-primary transition-colors"
+                    >
+                      {link}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Auth/Profile for desktop */}
-        {!token && (
-          <div className="hidden sm:flex gap-4 ml-5">
-            <button 
-              onClick={() => {navigate('/login')}} 
-              className="px-3 py-2 border border-primary text-primary rounded hover:bg-primary hover:text-light transition text-sm sm:text-base"
-            >
-              Login
-            </button>
-            <button 
-              onClick={() => {navigate('/register')}} 
-              className="px-3 py-2 bg-primary text-light rounded hover:bg-dark transition text-sm sm:text-base"
-            >
-              Register
-            </button>
-          </div>
-        )}
-        
-        {token && (
-          <div className="hidden sm:flex items-center space-x-4">
-            <FaBell
-              size={22}
-              className="text-primary cursor-pointer hover:text-dark transition"
-              onClick={() => alert('No new notifications!')}
-            />
-            <FaQuestionCircle
-              size={22}
-              className="text-primary cursor-pointer hover:text-dark transition"
-              onClick={onShowHelp}
-              title="Help & Tutorial"
-            />
-            <ProfileDropdown />
-          </div>
-        )}
-
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="absolute top-full left-0 w-full bg-white shadow-md flex flex-col items-start p-4 gap-3 sm:hidden z-20 border-b border-gray-200">
-            {features2.map((feature, index) => (
-              <div
-                key={index}
-                className="text-primary font-medium cursor-pointer hover:text-dark transition text-base py-1"
+        {/* Right side */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {!token && (
+            <div className="hidden sm:flex gap-2">
+              <button
+                onClick={() => navigate('/login')}
+                className="px-4 py-2 text-sm font-semibold border border-primary/40 text-primary rounded-xl hover:bg-primary-50 transition-colors"
               >
-                {feature.title}
-              </div>
-            ))}
-            
+                Login
+              </button>
+              <button
+                onClick={() => navigate('/register')}
+                className="px-4 py-2 text-sm font-semibold bg-primary text-white rounded-xl hover:bg-dark transition-colors shadow-sm"
+              >
+                Register
+              </button>
+            </div>
+          )}
+
+          {token && (
+            <div className="hidden sm:flex items-center gap-3">
+              <button
+                onClick={() => alert('No new notifications!')}
+                className="text-primary hover:text-dark transition relative"
+                aria-label="Notifications"
+              >
+                <FaBell size={20} />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-accent ring-2 ring-white" />
+              </button>
+              <button
+                onClick={onShowHelp}
+                className="text-primary hover:text-dark transition"
+                title="Help & Tutorial"
+                aria-label="Help"
+              >
+                <FaQuestionCircle size={20} />
+              </button>
+              <ProfileDropdown />
+            </div>
+          )}
+
+          {/* Hamburger */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl text-primary hover:bg-primary-50 transition-colors"
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="lg:hidden border-t border-primary-100 bg-white animate-fade-in max-h-[70vh] overflow-y-auto">
+          <div className="px-4 py-3 flex flex-col gap-1">
+            {navItems.map((item, index) => {
+              const expanded = openMobileIdx === index;
+              return (
+                <div key={index} className="border-b border-primary-100/60 last:border-0">
+                  <button
+                    onClick={() => setOpenMobileIdx(expanded ? null : index)}
+                    className="w-full flex items-center justify-between px-3 py-3 text-ink/80 font-medium hover:text-primary transition-colors"
+                  >
+                    {item.title}
+                    <FaChevronDown className={`text-xs opacity-60 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+                  </button>
+                  {expanded && (
+                    <div className="pb-2 pl-3 flex flex-col">
+                      {item.links.map((link) => (
+                        <button
+                          key={link}
+                          className="text-left px-3 py-2 rounded-lg text-sm text-ink/70 hover:bg-primary-50 hover:text-primary transition-colors"
+                        >
+                          {link}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
             {!token && (
-              <div className="flex flex-col gap-2 w-full mt-2">
-                <button 
-                  onClick={() => {navigate('/login'); setMenuOpen(false);}} 
-                  className="px-3 py-2 border border-primary text-primary rounded hover:bg-primary hover:text-light transition w-full text-base"
+              <div className="flex flex-col gap-2 mt-3">
+                <button
+                  onClick={() => { navigate('/login'); setMenuOpen(false); }}
+                  className="px-3 py-2.5 border border-primary/40 text-primary rounded-xl font-semibold hover:bg-primary-50 transition w-full"
                 >
                   Login
                 </button>
-                <button 
-                  onClick={() => {navigate('/register'); setMenuOpen(false);}} 
-                  className="px-3 py-2 bg-primary text-light rounded hover:bg-dark transition w-full text-base"
+                <button
+                  onClick={() => { navigate('/register'); setMenuOpen(false); }}
+                  className="px-3 py-2.5 bg-primary text-white rounded-xl font-semibold hover:bg-dark transition w-full"
                 >
                   Register
                 </button>
               </div>
             )}
-            
+
             {token && (
-              <div className="flex items-center space-x-4 mt-2">
-                <FaBell
-                  size={22}
-                  className="text-primary cursor-pointer hover:text-dark transition"
-                  onClick={() => alert('No new notifications!')}
-                />
-                <FaQuestionCircle
-                  size={22}
-                  className="text-primary cursor-pointer hover:text-dark transition"
-                  onClick={onShowHelp}
-                  title="Help & Tutorial"
-                />
+              <div className="flex items-center gap-4 mt-3 px-3 py-2">
+                <button onClick={() => alert('No new notifications!')} className="text-primary hover:text-dark transition" aria-label="Notifications">
+                  <FaBell size={20} />
+                </button>
+                <button onClick={onShowHelp} className="text-primary hover:text-dark transition" title="Help & Tutorial" aria-label="Help">
+                  <FaQuestionCircle size={20} />
+                </button>
                 <ProfileDropdown />
               </div>
             )}
           </div>
-        )}
-      </nav>
-    </div>
+        </div>
+      )}
+    </nav>
   )
 }
 
